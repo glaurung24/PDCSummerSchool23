@@ -1,0 +1,21 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: PDCSummerSchool23 exercises
+message: >-
+  This repository is used for the exercises from the PDC
+  summer school 2023
+type: software
+authors:
+  - given-names: Andreas
+    family-names: Theiler
+    email: andreas.theiler@physics.uu.se
+    affiliation: Uppsala University
+    orcid: 'https://orcid.org/0009-0000-3296-0223'
+repository-code: 'https://github.com/glaurung24/PDCSummerSchool23'
+abstract: |-
+  This repository is used for the exercises from the PDC
+    summer school 2023
+license: GPL-3.0
+version: '0.1'
