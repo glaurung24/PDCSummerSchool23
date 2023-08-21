@@ -50,39 +50,15 @@ int main(int argc, char *argv[]) {
     double ttotal = SEQUENTIAL::cp_Wtime();
 
     /* START: Do NOT optimize/parallelize the code of the main program above this point */
-
     /* 3. Allocate memory for the layer and initialize to zero */
     float *layer = (float *)malloc( sizeof(float) * layer_size );
     if ( layer == NULL) {
         fprintf(stderr,"Error: Allocating the layer memory\n");
         exit( EXIT_FAILURE );
     }
-    for( k=0; k<layer_size; k++ ) layer[k] = 0.0f;
-    
-    /* 4. Storms simulation */
-    for( i=0; i<num_storms; i++) {
-
-        /* 4.1. Add impacts energies to layer cells */
-        /* For each particle */
-        for( j=0; j<storms[i].size; j++ ) {
-            /* Get impact energy (expressed in thousandths) */
-            float energy = (float)storms[i].posval[j*2+1] * 1000;
-            /* Get impact position */
-            int position = storms[i].posval[j*2];
-
-            /* For each cell in the layer */
-            for( k=0; k<layer_size; k++ ) {
-                /* Update the energy value for the cell */
-                SEQUENTIAL::update( layer, layer_size, k, position, energy );
-            }
-        }
-
-        SEQUENTIAL::energy_relaxation(layer, layer_size, AVERAGING_WINDOW_SIZE);
-
-        /* 4.3. Locate the maximum value in the layer, and its position */
-        SEQUENTIAL::find_local_maximum(layer, layer_size, maximum[i], positions[i]);
-
-    }
+    SEQUENTIAL::run_calculation(layer, layer_size, storms, num_storms,
+                    maximum,
+                    positions);
 
     /* END: Do NOT optimize/parallelize the code below this point */
 

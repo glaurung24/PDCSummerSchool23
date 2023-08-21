@@ -4,7 +4,7 @@
 #include<sys/time.h>
 
 
-#include "energy_storms_mpi.hpp"
+#include "energy_storms_sequential.hpp"
 
 
 namespace SEQUENTIAL{
@@ -16,7 +16,37 @@ double cp_Wtime(){
     return tv.tv_sec + 1.0e-6 * tv.tv_usec;
 }
 
+void run_calculation(float* layer, const int& layer_size, Storm* storms, const int& num_storms,
+                float* maximum,
+                int* positions){
 
+    for(int k=0; k<layer_size; k++ ) layer[k] = 0.0f;
+    
+    /* 4. Storms simulation */
+    for(int i=0; i<num_storms; i++) {
+
+        /* 4.1. Add impacts energies to layer cells */
+        /* For each particle */
+        for(int j=0; j<storms[i].size; j++ ) {
+            /* Get impact energy (expressed in thousandths) */
+            float energy = (float)storms[i].posval[j*2+1] * 1000;
+            /* Get impact position */
+            int position = storms[i].posval[j*2];
+
+            /* For each cell in the layer */
+            for(int k=0; k<layer_size; k++ ) {
+                /* Update the energy value for the cell */
+                update( layer, layer_size, k, position, energy );
+            }
+        }
+
+        energy_relaxation(layer, layer_size, AVERAGING_WINDOW_SIZE);
+
+        /* 4.3. Locate the maximum value in the layer, and its position */
+        find_local_maximum(layer, layer_size, maximum[i], positions[i]);
+
+    }
+}
 
 /* THIS FUNCTION CAN BE MODIFIED */
 /* Function to update a single position of the layer */
