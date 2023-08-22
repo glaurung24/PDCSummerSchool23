@@ -16,6 +16,14 @@ double cp_Wtime(){
     return tv.tv_sec + 1.0e-6 * tv.tv_usec;
 }
 
+void read_storm_files(int argc,
+                    char* argv[], 
+                    Storm* storms, 
+                    const int& num_storms){
+    for(int i=2; i<argc; i++ ) 
+        storms[i-2] = read_storm_file( argv[i] );
+}
+
 void run_calculation(float* layer, const int& layer_size, Storm* storms, const int& num_storms,
                 float* maximum,
                 int* positions){
@@ -110,7 +118,7 @@ void debug_print(int layer_size, float *layer, int *positions, float *maximum, i
 /*
  * Function: Read data of particle storms from a file
  */
-Storm read_storm_file( char *fname ) {
+Storm read_storm_file(char *fname ) {
     FILE *fstorm = fopen( fname, "r" );
     if ( fstorm == NULL ) {
         fprintf(stderr,"Error: Opening storm file %s\n", fname );

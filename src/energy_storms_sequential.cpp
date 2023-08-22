@@ -22,7 +22,6 @@
  * MAIN PROGRAM
  */
 int main(int argc, char *argv[]) {
-    int i,j,k;
 
     /* 1.1. Read arguments */
     if (argc<3) {
@@ -35,13 +34,12 @@ int main(int argc, char *argv[]) {
     SEQUENTIAL::Storm storms[ num_storms ];
 
     /* 1.2. Read storms information */
-    for( i=2; i<argc; i++ ) 
-        storms[i-2] = SEQUENTIAL::read_storm_file( argv[i] );
+    SEQUENTIAL::read_storm_files(argc, argv, storms, num_storms);
 
     /* 1.3. Intialize maximum levels to zero */
     float maximum[ num_storms ];
     int positions[ num_storms ];
-    for (i=0; i<num_storms; i++) {
+    for (int i=0; i<num_storms; i++) {
         maximum[i] = 0.0f;
         positions[i] = 0;
     }
@@ -76,12 +74,12 @@ int main(int argc, char *argv[]) {
     printf("Time: %lf\n", ttotal );
     /* 7.2. Print the maximum levels */
     printf("Result:");
-    for (i=0; i<num_storms; i++)
+    for (int i=0; i<num_storms; i++)
         printf(" %d %f", positions[i], maximum[i] );
     printf("\n");
 
     /* 8. Free resources */    
-    for( i=0; i<argc-2; i++ )
+    for(int i=0; i<argc-2; i++ )
         free( storms[i].posval );
 
     /* 9. Program ended successfully */
