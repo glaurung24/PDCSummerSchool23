@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.14)
 
 project(EnergyStorms LANGUAGES CXX)
 
+set(CMAKE_CXX_FLAGS_DEBUG "-g -DDEBUG -pg") # enable profiling and debug printout
+set(CMAKE_VERBOSE_MAKEFILE ON)
+
 
 # Sequential program
 add_library(sequential_functions SHARED 
@@ -14,7 +17,7 @@ add_executable(energy_storms_seq
 target_link_libraries(energy_storms_seq PUBLIC
                     sequential_functions)   
 target_include_directories(energy_storms_seq PRIVATE
-                ${CMAKE_CURRENT_SOURCE_DIR}/include)    
+                ${CMAKE_CURRENT_SOURCE_DIR}/include) 
 
 #mpi program
 
@@ -27,15 +30,25 @@ add_executable(energy_storms_mpi
                 )
 target_link_libraries(energy_storms_seq PUBLIC
                     mpi_functions)   
-target_include_directories(energy_storms_seq PRIVATE
+target_include_directories(energy_storms_mpi PRIVATE
                 ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 
 
+#Set up testing
 
-# Sets DEBUG precompiler flag to run visual output correctly
-if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-    target_compile_options(energy_storms_seq PRIVATE
-                            "-DDEBUG")                     
-endif()
-
+include(CTest)
+add_executable(mpi_test_run_calculation
+        ${CMAKE_CURRENT_SOURCE_DIR}/tests/testMPIRunCalculation.cpp
+)
+target_include_directories(mpi_test_run_calculation PRIVATE
+                    ${CMAKE_CURRENT_SOURCE_DIR}/include)  
+target_link_libraries(mpi_test_run_calculation PRIVATE
+                            sequential_functions
+                            mpi_functions
+)
+# enable testing functionality
+# enable_testing()
+add_test(NAME mpi_test_run_calculation
+        COMMAND mpi_test_run_calculation 100 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p5_w3
+)
