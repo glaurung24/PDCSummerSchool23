@@ -20,12 +20,13 @@ void read_storm_files(int argc,
 void run_calculation(float* layer, const int& layer_size, Storm* storms, const int& num_storms,
                 float* maximum,
                 int* positions);
-void update( float *layer, int layer_size, int k, int pos, float energy );
+void update( float *layer, const int& layer_size, const int& k, const int& pos, const float&  energy, float* lookup_squrt[] );
 void debug_print(int layer_size, float *layer, int *positions, float *maximum, int num_storms );
 Storm read_storm_file( char *fname );
 void debug_print(int layer_size, float *layer, int *positions, float *maximum, int num_storms );
 Storm read_storm_file(char *fname );
 void energy_relaxation(float* layer, const int& layer_size, const int& windowSize);
 void find_local_maximum(float* layer, const int& layer_size, float& maximum, int& position );
+void create_sqrt_lookup(float* lookup_sqrt[], const int& size);
 
 }; //end of namespace SEQUENTIAL
