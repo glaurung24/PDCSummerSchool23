@@ -30,6 +30,7 @@ int main(int argc, char *argv[]) {
     }
 
     int layer_size = atoi( argv[1] );
+    int max_distance = layer_size;
     int num_storms = argc-2;
     SEQUENTIAL::Storm storms[ num_storms ];
 

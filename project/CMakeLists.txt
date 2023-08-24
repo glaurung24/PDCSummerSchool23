@@ -3,7 +3,8 @@ cmake_minimum_required(VERSION 3.14)
 project(EnergyStorms LANGUAGES CXX)
 
 set(CMAKE_CXX_FLAGS_DEBUG "-g -DDEBUG -pg") # enable profiling and debug printout
-set(CMAKE_VERBOSE_MAKEFILE ON)
+# set(CMAKE_VERBOSE_MAKEFILE ON)
+set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
 
 # Sequential program
@@ -20,6 +21,8 @@ target_include_directories(energy_storms_seq PRIVATE
                 ${CMAKE_CURRENT_SOURCE_DIR}/include) 
 
 #mpi program
+find_package(MPI REQUIRED)
+message(STATUS "Run: ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${MPIEXEC_MAX_NUMPROCS} ${MPIEXEC_PREFLAGS} EXECUTABLE ${MPIEXEC_POSTFLAGS} ARGS")
 
 add_library(mpi_functions SHARED 
             ${CMAKE_CURRENT_SOURCE_DIR}/src/energy_storms_mpi_functions.cpp)  
@@ -28,8 +31,8 @@ target_include_directories(mpi_functions PRIVATE
 add_executable(energy_storms_mpi
                 src/energy_storms_mpi.cpp
                 )
-target_link_libraries(energy_storms_seq PUBLIC
-                    mpi_functions)   
+target_link_libraries(energy_storms_mpi PUBLIC
+                    mpi_functions MPI::MPI_CXX)   
 target_include_directories(energy_storms_mpi PRIVATE
                 ${CMAKE_CURRENT_SOURCE_DIR}/include)
 

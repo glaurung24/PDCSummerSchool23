@@ -2,6 +2,7 @@
 
 #define THRESHOLD    0.001f
 #define AVERAGING_WINDOW_SIZE 3
+#define MPI_ROOT 0
 
 
 namespace MPI_FUNCTIONS{
@@ -10,6 +11,12 @@ typedef struct {
     int size;    // Number of particles
     int *posval; // Positions and values
 } Storm;
+
+typedef struct {
+    int size;
+    int rank;
+    const int root = MPI_ROOT;
+} MPIInfo;
 
 double cp_Wtime();
 void read_storm_files(int argc, 
