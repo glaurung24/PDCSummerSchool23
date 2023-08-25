@@ -24,9 +24,9 @@ void read_storm_files(int argc,
         storms[i-2] = read_storm_file( argv[i] );
 }
 
-void create_sqrt_lookup(float* lookup_sqrt[],const int& size){
+void create_lookup(float* lookup_sqrt[],const int& size){
     for(int i = 0; i < size; i++){
-        (*lookup_sqrt)[i] = sqrtf(i+1);
+        (*lookup_sqrt)[i] = 1./sqrtf(i+1)/size;
     }
 }
 
@@ -36,8 +36,8 @@ void run_calculation(float* layer, const int& layer_size, Storm* storms, const i
 
     for(int k=0; k<layer_size; k++ ) layer[k] = 0.0f;
 
-    float* lookup_sqrt = new float[layer_size];
-    create_sqrt_lookup(&lookup_sqrt, layer_size);
+    float* lookup_factor = new float[layer_size];
+    create_lookup(&lookup_factor, layer_size);
     
     /* 4. Storms simulation */
     for(int i=0; i<num_storms; i++) {
@@ -53,7 +53,7 @@ void run_calculation(float* layer, const int& layer_size, Storm* storms, const i
             /* For each cell in the layer */
             for(int k=0; k<layer_size; k++ ) {
                 /* Update the energy value for the cell */
-                update( layer, layer_size, k, position, energy, &lookup_sqrt);
+                update( layer, layer_size, k, position, energy, &lookup_factor);
             }
         }
 
@@ -65,12 +65,12 @@ void run_calculation(float* layer, const int& layer_size, Storm* storms, const i
         
 
     }
-    delete [] lookup_sqrt;
+    delete [] lookup_factor;
 }
 
 /* THIS FUNCTION CAN BE MODIFIED */
 /* Function to update a single position of the layer */
-void update( float *layer, const int& layer_size, const int& k, const int& pos, const float& energy, float* lookup_sqrt[] ) {
+void update( float *layer, const int& layer_size, const int& k, const int& pos, const float& energy, float* lookup_factor[] ) {
     /* 1. Compute the absolute value of the distance between the
         impact position and the k-th position of the layer */
     int distance = abs(pos - k);
@@ -81,17 +81,17 @@ void update( float *layer, const int& layer_size, const int& k, const int& pos, 
     /* 3. Square root of the distance */
     /* NOTE: Real world atenuation typically depends on the square of the distance.
        We use here a tailored equation that affects a much wider range of cells */
-    float atenuation;
+    float factor;
     if(distance >= layer_size){
-        atenuation = sqrtf((float)(distance +1));
+        factor = 1/sqrtf((float)(distance +1))/layer_size;
     }
     else{
-        atenuation = (*lookup_sqrt)[distance];
+        factor = (*lookup_factor)[distance];
     }
 
 
     /* 4. Compute attenuated energy */
-    float energy_k = energy / layer_size / atenuation;
+    float energy_k = energy *factor;
 
     /* 5. Do not add if its absolute value is lower than the threshold */
     if ( energy_k >= THRESHOLD / layer_size || energy_k <= -THRESHOLD / layer_size ) //TODO are negative energies?
