@@ -1,10 +1,13 @@
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.18)
 
-project(EnergyStorms LANGUAGES CXX)
+project(EnergyStorms LANGUAGES CXX CUDA)
 
 set(CMAKE_CXX_FLAGS_DEBUG "-g -DDEBUG -pg") # enable profiling and debug printout
 # set(CMAKE_VERBOSE_MAKEFILE ON)
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED On)
+set(CMAKE_CXX_EXTENSIONS Off)
 
 
 # --------------------- get git info -----------------------------------------------
@@ -81,6 +84,33 @@ target_link_libraries(energy_storms_mpi PUBLIC
                     mpi_functions MPI::MPI_CXX)   
 target_include_directories(energy_storms_mpi PRIVATE
                 ${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+#cuda program
+include(CheckLanguage)
+check_language(CUDA)
+if(CMAKE_CUDA_COMPILER)
+        enable_language(CUDA)
+        if(NOT DEFINED CMAKE_CUDA_STANDARD)
+                set(CMAKE_CUDA_STANDARD 11)
+                set(CMAKE_CUDA_STANDARD_REQUIRED ON)
+        endif()
+        add_library(cuda_functions SHARED 
+                ${CMAKE_CURRENT_SOURCE_DIR}/src/energy_storms_cuda_functions.cu)
+        set_target_properties(cuda_functions PROPERTIES
+                CUDA_SEPARABLE_COMPILATION ON
+                CUDA_ARCHITECTURES native)
+        target_include_directories(cuda_functions PRIVATE
+                        ${CMAKE_CURRENT_SOURCE_DIR}/include
+                        CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES)    
+        add_executable(energy_storms_cuda
+                        src/energy_storms_cuda.cpp
+                        )
+        target_link_libraries(energy_storms_cuda PUBLIC
+                        cuda_functions MPI::MPI_CXX)   
+        target_include_directories(energy_storms_cuda PRIVATE
+                        ${CMAKE_CURRENT_SOURCE_DIR}/include)
+endif()
+
 
 
 
