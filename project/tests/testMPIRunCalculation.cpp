@@ -7,7 +7,7 @@
 #include "energy_storms_sequential.hpp"
 #include "energy_storms_mpi.hpp"
 
-#define EPS 1E-10
+#define EPS 1E-6 //precision of float
 
 /*
  * MAIN PROGRAM
@@ -60,20 +60,26 @@ int main(int argc, char *argv[]) {
                     maximum_mpi,
                     positions_mpi);
 
+    bool error = false;
     for(int i = 0; i < layer_size; i++){
-        if(abs(layer[i] - layer_mpi[i]) > EPS ){
+        if(abs(layer[i] - layer_mpi[i]) > abs(layer[i]*EPS) ){
             std::cout << "Error in layer check" << std::endl;
-            return -1;
+            error = true;
+            break;
         }
     }
     for(int i = 0; i < num_storms; i++){
-        if(abs(maximum[i] - maximum_mpi[i]) > EPS ){
+        if(abs(maximum[i] - maximum_mpi[i]) > abs(maximum[i]*EPS) ){
             std::cout << "Error in maximum check" << std::endl;
-            return -2;
+            error = true;
+            break;
         }
+    }
+    for(int i = 0; i < num_storms; i++){
         if(positions[i] != positions_mpi[i]){
             std::cout << "Error in positions check" << std::endl;
-            return -3;
+            error = true;
+            break;
         }
     }
 
@@ -81,7 +87,9 @@ int main(int argc, char *argv[]) {
     /* 8. Free resources */    
     for(int i=0; i<argc-2; i++ )
         free( storms[i].posval );
-
+    if(error){
+        exit(EXIT_FAILURE);
+    }
     /* 9. Program ended successfully */
     return 0;
 }
