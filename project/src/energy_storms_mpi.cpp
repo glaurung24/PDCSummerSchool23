@@ -118,13 +118,10 @@ int main(int argc, char *argv[]) {
     }
 
     MPI_Barrier(MPI_COMM_WORLD);
-    std::cout << "Error pos 0, rank: " << mpi_info.rank << std::endl;
     /* 8. Free resources */    
     for(int i=0; i<argc-2; i++ )
         delete[] storms[i].posval;
-std::cout << "Error pos 1, rank: " << mpi_info.rank << std::endl;
     delete[] layer;
-std::cout << "Error pos 2, rank: " << mpi_info.rank << std::endl;
     
     /* 9. Program ended successfully */
     MPI_Finalize();
