@@ -2,7 +2,7 @@
 
 #define THRESHOLD    0.001f
 #define AVERAGING_WINDOW_SIZE 3
-#define MPI_ROOT 0
+#define MPI_ROOT_PROCESS 0
 
 
 namespace MPI_FUNCTIONS{
@@ -15,7 +15,7 @@ typedef struct {
 typedef struct {
     int size;
     int rank;
-    const int root = MPI_ROOT;
+    int root = MPI_ROOT_PROCESS;
 } MPIInfo;
 
 double cp_Wtime();
@@ -26,7 +26,8 @@ void read_storm_files(int argc,
                     );
 void run_calculation(float* layer, const int& layer_size, Storm* storms, const int& num_storms,
                 float* maximum,
-                int* positions);
+                int* positions,
+                MPIInfo& mpi_info);
 void update( float *layer, int layer_size, int k, int pos, float energy );
 void debug_print(int layer_size, float *layer, int *positions, float *maximum, int num_storms );
 Storm read_storm_file( char *fname );

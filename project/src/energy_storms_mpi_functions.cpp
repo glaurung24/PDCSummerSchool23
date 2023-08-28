@@ -2,6 +2,9 @@
 #include<stdlib.h>
 #include<math.h>
 #include<sys/time.h>
+#include <mpi.h>
+#include <algorithm>
+#include <iterator>
 
 
 #include "energy_storms_mpi.hpp"
@@ -26,16 +29,23 @@ void read_storm_files(int argc,
 
 void run_calculation(float* layer, const int& layer_size, Storm* storms, const int& num_storms,
                 float* maximum,
-                int* positions){
+                int* positions,
+                MPIInfo& mpi_info){
+
+
 
     for(int k=0; k<layer_size; k++ ) layer[k] = 0.0f;
+    float* layer_sum;
+    if(mpi_info.rank == mpi_info.root){
+        layer_sum = new float[layer_size];
+    }
     
     /* 4. Storms simulation */
     for(int i=0; i<num_storms; i++) {
 
         /* 4.1. Add impacts energies to layer cells */
         /* For each particle */
-        for(int j=0; j<storms[i].size; j++ ) {
+        for(int j=mpi_info.rank; j<storms[i].size; j += mpi_info.size ) { //TODO check if for loop breaks before j<storms[i].size
             /* Get impact energy (expressed in thousandths) */
             float energy = (float)storms[i].posval[j*2+1] * 1000;
             /* Get impact position */
@@ -48,11 +58,29 @@ void run_calculation(float* layer, const int& layer_size, Storm* storms, const i
             }
         }
 
-        energy_relaxation(layer, layer_size, AVERAGING_WINDOW_SIZE);
 
-        /* 4.3. Locate the maximum value in the layer, and its position */
-        find_local_maximum(layer, layer_size, maximum[i], positions[i]);
+        MPI_Reduce(layer, layer_sum, layer_size, MPI_FLOAT, MPI_SUM, mpi_info.root, MPI_COMM_WORLD);
 
+        if(mpi_info.rank == mpi_info.root){
+            std::swap(layer, layer_sum); //Move data back to layer of root processs
+            
+            energy_relaxation(layer, layer_size, AVERAGING_WINDOW_SIZE);
+
+            /* 4.3. Locate the maximum value in the layer, and its position */
+            find_local_maximum(layer, layer_size, maximum[i], positions[i]);
+        }
+        else{
+            for(int k=0; k<layer_size; k++ ) layer[k] = 0.0f; //Reset layer in other processes
+        }
+    }
+    if(mpi_info.rank == mpi_info.root){
+        //Error happens if pointer of layer is not original pointer
+        //This happens for odd numbers of storms
+        if(num_storms%2){
+            std::swap(layer, layer_sum);
+            memcpy(layer, layer_sum, sizeof(float)*layer_size); //TODO use containers instead...
+        }
+        delete[] layer_sum; // only allocated for root
     }
 }
 
@@ -132,7 +160,7 @@ Storm read_storm_file(char *fname ) {
         exit( EXIT_FAILURE );
     }
 
-    storm.posval = (int *)malloc( sizeof(int) * storm.size * 2 );
+    storm.posval = new int[storm.size * 2 ];
     if ( storm.posval == NULL ) {
         fprintf(stderr,"Error: Allocating memory for storm file %s, with size %d\n", fname, storm.size );
         exit( EXIT_FAILURE );
@@ -157,7 +185,7 @@ Storm read_storm_file(char *fname ) {
 void energy_relaxation(float* layer, const int& layer_size, const int& windowSize){
         /* 4.2. Energy relaxation between storms */
         /* 4.2.1. Copy values to the ancillary array */
-        float *layer_copy = (float *)malloc( sizeof(float) * layer_size );
+        float *layer_copy = (float *)malloc( sizeof(float) * layer_size ); //TODO check if avoiding this malloc speeds things up
         for(int k=0; k<layer_size; k++ ) 
             layer_copy[k] = layer[k];
 
