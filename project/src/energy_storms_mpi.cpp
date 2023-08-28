@@ -19,6 +19,7 @@
 #include <iostream>
 #include "energy_storms_mpi.hpp"
 #include <mpi.h>
+#include "version.hpp"
 
 /*
  * MAIN PROGRAM
@@ -65,7 +66,6 @@ int main(int argc, char *argv[]) {
     int num_storms = argc-2;
 
 
-
     MPI_FUNCTIONS::Storm storms[ num_storms ];
 
     /* 1.2. Read storms information */
@@ -77,6 +77,18 @@ int main(int argc, char *argv[]) {
     for (int i=0; i<num_storms; i++) {
         maximum[i] = 0.0f;
         positions[i] = 0;
+    }
+    // Print out build info
+    if(mpi_info.rank == mpi_info.root){
+        std::cout << "Revision: " << GIT_REV;
+        std::cout << ", tag: " << GIT_TAG;
+        std::cout << ", branch: " << GIT_BRANCH;
+        std::cout << std::endl;
+    }
+    // Print out MPI info
+    if(mpi_info.rank == mpi_info.root){
+        std::cout << "Nr mpi processes: " << mpi_info.size;
+        std::cout << std::endl;
     }
     MPI_Barrier(MPI_COMM_WORLD); //Barrier to ensure correct time measurement
     if(mpi_info.rank == mpi_info.root){
