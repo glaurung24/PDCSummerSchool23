@@ -71,7 +71,7 @@ target_include_directories(energy_storms_seq PRIVATE
 
 #mpi program
 find_package(MPI REQUIRED)
-message(STATUS "Run: ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${MPIEXEC_MAX_NUMPROCS} ${MPIEXEC_PREFLAGS} EXECUTABLE ${MPIEXEC_POSTFLAGS} ARGS")
+# message(STATUS "Run: ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${MPIEXEC_MAX_NUMPROCS} ${MPIEXEC_PREFLAGS} EXECUTABLE ${MPIEXEC_POSTFLAGS} ARGS")
 
 add_library(mpi_functions SHARED 
             ${CMAKE_CURRENT_SOURCE_DIR}/src/energy_storms_mpi_functions.cpp)  
@@ -100,15 +100,26 @@ if(CMAKE_CUDA_COMPILER)
                 CUDA_SEPARABLE_COMPILATION ON
                 CUDA_ARCHITECTURES native)
         target_include_directories(cuda_functions PRIVATE
+                        CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES
                         ${CMAKE_CURRENT_SOURCE_DIR}/include
                         CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES)    
         add_executable(energy_storms_cuda
                         src/energy_storms_cuda.cpp
                         )
         target_link_libraries(energy_storms_cuda PUBLIC
-                        cuda_functions MPI::MPI_CXX)   
+                        cuda_functions)   
         target_include_directories(energy_storms_cuda PRIVATE
                         ${CMAKE_CURRENT_SOURCE_DIR}/include)
+        # CUDA Test executable
+        add_executable(cuda_test_run_calculation
+                ${CMAKE_CURRENT_SOURCE_DIR}/tests/testCUDARunCalculation.cpp
+        )
+        target_include_directories(cuda_test_run_calculation PRIVATE
+                        ${CMAKE_CURRENT_SOURCE_DIR}/include)  
+        target_link_libraries(cuda_test_run_calculation PRIVATE
+                                sequential_functions
+                                cuda_functions
+        )
 endif()
 
 
@@ -117,17 +128,34 @@ endif()
 #Set up testing
 
 include(CTest)
-add_executable(mpi_test_run_calculation
-        ${CMAKE_CURRENT_SOURCE_DIR}/tests/testMPIRunCalculation.cpp
-)
-target_include_directories(mpi_test_run_calculation PRIVATE
-                    ${CMAKE_CURRENT_SOURCE_DIR}/include)  
-target_link_libraries(mpi_test_run_calculation PRIVATE
-                            sequential_functions
-                            mpi_functions
-)
+#MPI
+# add_executable(mpi_test_run_calculation
+#         ${CMAKE_CURRENT_SOURCE_DIR}/tests/testMPIRunCalculation.cpp
+# )
+# target_include_directories(mpi_test_run_calculation PRIVATE
+#                     ${CMAKE_CURRENT_SOURCE_DIR}/include)  
+# target_link_libraries(mpi_test_run_calculation PRIVATE
+#                             sequential_functions
+#                             mpi_functions
+# )
+
 # enable testing functionality
 # enable_testing()
-add_test(NAME mpi_test_run_calculation
-        COMMAND mpi_test_run_calculation 100 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p5_w3
+add_test(NAME CUDA_basic_test
+        COMMAND cuda_test_run_calculation 35 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p5_w3 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p7_w2 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p8_w1 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p8_w4
 )
+add_test(NAME CUDA_extreme_positions_1
+        COMMAND cuda_test_run_calculation 16 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_09_a16-17_p3_w1
+)
+add_test(NAME CUDA_extreme_positions_2
+        COMMAND cuda_test_run_calculation 17 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_09_a16-17_p3_w1
+)
+
+# add_test(NAME MPI_basic_test
+#         COMMAND mpiexec -np 8 mpi_test_run_calculation 35 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p5_w3 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p7_w2 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p8_w1 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p8_w4
+# )
+
+# add_test(NAME mpi_test_run_calculation
+#         COMMAND mpi_test_run_calculation 100 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p5_w3
+# )
+
