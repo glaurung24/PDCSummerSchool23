@@ -9,7 +9,6 @@
 #include <thrust/transform.h>
 #include <thrust/execution_policy.h>
 #include <thrust/functional.h>
-
 #include "energy_storms_cuda.hpp"
 
 namespace CUDA{
@@ -95,14 +94,39 @@ void run_calculation(float* layer, const int& layer_size, Storm* storms, const i
                                 thrust::identity<bool>()
                             );
         }
-        cudaMemcpy(layer, layer_device.data().get(), layer_size*sizeof(float), cudaMemcpyDeviceToHost);
-        energy_relaxation(layer, layer_size, AVERAGING_WINDOW_SIZE);
+        
+        /* 4.2. Energy relaxation between storms */
+        /* 4.2.1. Copy values to the ancillary array */
+        thrust::device_vector<float> layer_copy = layer_device;
 
+        /* 4.2.2. Update layer using the ancillary values.
+                  Skip updating the first and last positions */
+        // for(int k=1; k<layer_size-1; k++ )
+        //     layer[k] = ( layer_copy[k-1] + layer_copy[k] + layer_copy[k+1] ) / 3;
+        thrust::transform(thrust::device,
+                            layer_copy.begin(), 
+                            layer_copy.end()-2, 
+                            layer_device.begin()+1, 
+                            layer_device.begin()+1,
+                            thrust::plus<float>()
+                        );
+        thrust::transform(thrust::device,
+                        layer_copy.begin()+2, 
+                        layer_copy.end(), 
+                        layer_device.begin()+1, 
+                        layer_device.begin()+1,
+                        (thrust::placeholders::_1 +
+                        thrust::placeholders::_2)/3.0f
+                    );
+        cudaMemcpy(layer, layer_device.data().get(), layer_size*sizeof(float), cudaMemcpyDeviceToHost);
         /* 4.3. Locate the maximum value in the layer, and its position */
-        find_local_maximum(layer, layer_size, maximum[i], positions[i]);
-        cudaMemcpy(layer_device.data().get(), layer, layer_size*sizeof(float), cudaMemcpyHostToDevice);
+        thrust::device_vector<float>::iterator result;
+        result = thrust::max_element(thrust::device, layer_device.begin()+1, layer_device.end()-1);
+        maximum[i] = *result;
+        positions[i] = thrust::distance(layer_device.begin(), result);
+        // find_local_maximum(layer, layer_size, maximum[i], positions[i]); //TODO delete
     }
-    
+    cudaMemcpy(layer_device.data().get(), layer, layer_size*sizeof(float), cudaMemcpyHostToDevice);
 }
 
 /* THIS FUNCTION CAN BE MODIFIED */
@@ -202,20 +226,34 @@ Storm read_storm_file(char *fname ) {
     return storm;
 }
 
-// Energy relaxation between storms (moving average filter over windowSize elements)
-void energy_relaxation(float* layer, const int& layer_size, const int& windowSize){
-        /* 4.2. Energy relaxation between storms */
-        /* 4.2.1. Copy values to the ancillary array */
-        float *layer_copy = (float *)malloc( sizeof(float) * layer_size );
-        for(int k=0; k<layer_size; k++ ) 
-            layer_copy[k] = layer[k];
+// // Energy relaxation between storms (moving average filter over windowSize elements)
+// void energy_relaxation(thrust::device_vector<float>& layer){
+//         /* 4.2. Energy relaxation between storms */
+//         /* 4.2.1. Copy values to the ancillary array */
+//         thrust::device_vector<float> layer_copy = layer;
 
-        /* 4.2.2. Update layer using the ancillary values.
-                  Skip updating the first and last positions */
-        for(int k=1; k<layer_size-1; k++ )
-            layer[k] = ( layer_copy[k-1] + layer_copy[k] + layer_copy[k+1] ) / 3;
+//         /* 4.2.2. Update layer using the ancillary values.
+//                   Skip updating the first and last positions */
+//         // for(int k=1; k<layer_size-1; k++ )
+//         //     layer[k] = ( layer_copy[k-1] + layer_copy[k] + layer_copy[k+1] ) / 3;
+//         thrust::transform(thrust::device,
+//                             layer_copy.begin(), 
+//                             layer_copy.end()-2, 
+//                             layer.begin()+1, 
+//                             layer.begin()+1,
+//                             thrust::plus<float>()
+//                         );
+//         thrust::transform(thrust::device,
+//                         layer_copy.begin()+2, 
+//                         layer_copy.end(), 
+//                         layer.begin()+1, 
+//                         layer.begin()+1,
+//                         (thrust::placeholders::_1 +
+//                         thrust::placeholders::_2)/3.0f
+//                     );
 
-}
+
+// }
 
 void find_local_maximum(float* layer, const int& layer_size, float& maximum, int& position ){
     for(int k=1; k<layer_size-1; k++ ) {

@@ -1,5 +1,7 @@
 #pragma once
 
+// #include <thrust/device_vector.h>
+
 #define THRESHOLD    0.001f
 #define AVERAGING_WINDOW_SIZE 3
 
@@ -25,7 +27,7 @@ void debug_print(int layer_size, float *layer, int *positions, float *maximum, i
 Storm read_storm_file( char *fname );
 void debug_print(int layer_size, float *layer, int *positions, float *maximum, int num_storms );
 Storm read_storm_file(char *fname );
-void energy_relaxation(float* layer, const int& layer_size, const int& windowSize);
+// void energy_relaxation(thrust::device_vector<float>& layer);
 void find_local_maximum(float* layer, const int& layer_size, float& maximum, int& position );
 
 }; //end of namespace CUDA
