@@ -38,15 +38,15 @@ struct above_threshold
     }
 };
 
-
 void run_calculation(float* layer, const int& layer_size, Storm* storms, const int& num_storms,
                 float* maximum,
                 int* positions){
     //lookup table for prefactor 1/sqrt(distance)/layer_size
     //It needs to be 2*layer_size to fit 
-    thrust::host_vector<float> look_up(2*layer_size);
+    thrust::host_vector<float> look_up;
+    look_up.reserve(2*layer_size);
     for(int i = 0; i<2*layer_size; i++){
-        look_up.push_back(1./sqrtf(abs(layer_size-1)+1)/layer_size); //TODO this should be done on the gpu
+        look_up.push_back(1.0f/sqrtf((float)abs(layer_size-i)+1)/(float)layer_size); //TODO this should be done on the gpu
     }
     thrust::device_vector<float> look_up_device = look_up;
     thrust::device_vector<float> layer_device(layer_size,0);
@@ -62,16 +62,20 @@ void run_calculation(float* layer, const int& layer_size, Storm* storms, const i
             /* Get impact energy (expressed in thousandths) */
             float energy = (float)storms[i].posval[j*2+1] * 1000;
             /* Get impact position */
-            int position = storms[i].posval[j*2];
+            int position = storms[i].posval[j*2]; //TODO check if position is outside of range
             int translated_position = layer_size-position; //relative position to find right part of lookup
+            if(translated_position+layer_size > 2*layer_size){
+                std::cerr << "position outside of layer" << std::endl;
+                exit(EXIT_FAILURE);
+            }
 
-            //Update operation
+            //Update
             // float energy_k = energy / layer_size / atenuacion;
-            thrust::transform(thrust::device, 
-                                look_up.begin()+translated_position, 
-                                look_up.begin()+translated_position+layer_size,
+            thrust::transform(thrust::device, //TODO 
+                                look_up_device.begin()+translated_position, 
+                                look_up_device.begin()+translated_position+layer_size-1,
                                 energy_vector_device.begin(),
-                                thrust::placeholders::_1 * energy
+                                thrust::placeholders::_1*energy
                             );
             // if ( energy_k >= THRESHOLD / layer_size || energy_k <= -THRESHOLD / layer_size )
             thrust::transform(thrust::device, 
@@ -98,6 +102,7 @@ void run_calculation(float* layer, const int& layer_size, Storm* storms, const i
         find_local_maximum(layer, layer_size, maximum[i], positions[i]);
         cudaMemcpy(layer_device.data().get(), layer, layer_size*sizeof(float), cudaMemcpyHostToDevice);
     }
+    
 }
 
 /* THIS FUNCTION CAN BE MODIFIED */
