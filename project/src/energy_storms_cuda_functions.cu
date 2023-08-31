@@ -269,13 +269,14 @@ void run_calculation(float* layer, const int& layer_size, Storm* storms, const i
             thrust::identity<bool>()
         );
         thrust::device_vector<float>::iterator result;
-        thrust::device_vector<float> layer_device_tmp(layer_size-2,0);
-        thrust::transform(thrust::device,
+        thrust::device_vector<float> layer_device_tmp(layer_size-2,0); //vector for all local maximas
+        thrust::transform_if(thrust::device,
                     layer_device.begin()+1,
                     layer_device.end()-1,
                     stencil.begin(),
                     layer_device_tmp.begin(),
-                    thrust::multiplies<float>()
+                    thrust::identity<float>(),
+                    thrust::identity<bool>()
                 );
         result = thrust::max_element(thrust::device, layer_device_tmp.begin(), layer_device_tmp.end());
         maximum[i] = *result;

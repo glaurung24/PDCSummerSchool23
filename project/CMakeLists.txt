@@ -150,6 +150,18 @@ add_test(NAME CUDA_extreme_positions_1
 add_test(NAME CUDA_extreme_positions_2
         COMMAND cuda_test_run_calculation 17 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_09_a16-17_p3_w1
 )
+add_test(NAME CUDA_test_03
+        COMMAND cuda_test_run_calculation 20 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_03_a20_p4_w1
+)
+add_test(NAME CUDA_test_04
+        COMMAND cuda_test_run_calculation 20 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_04_a20_p4_w1
+)
+add_test(NAME CUDA_test_05
+        COMMAND cuda_test_run_calculation 20 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_05_a20_p4_w1
+)
+add_test(NAME CUDA_test_06
+        COMMAND cuda_test_run_calculation 20 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_06_a20_p4_w1
+)
 
 # add_test(NAME MPI_basic_test
 #         COMMAND mpiexec -np 8 mpi_test_run_calculation 35 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p5_w3 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p7_w2 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p8_w1 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p8_w4
