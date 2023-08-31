@@ -250,15 +250,36 @@ void run_calculation(float* layer, const int& layer_size, Storm* storms, const i
                         (thrust::placeholders::_1 +
                         thrust::placeholders::_2)/3.0f
                     );
-        // for(int k = 0; k < layer_size; k++){ //TODO remove
-        //     std::cout << layer_device[k] << ", ";
-        // }
-        // std::cout << std::endl;
         // cudaMemcpy(layer, layer_device.data().get(), layer_size*sizeof(float), cudaMemcpyDeviceToHost);
         /* 4.3. Locate the maximum value in the layer, and its position */
+        thrust::transform(thrust::device,
+                    layer_device.begin()+1, 
+                    layer_device.end()-1, 
+                    layer_device.begin(), 
+                    stencil.begin(), 
+                    thrust::greater<float>());
 
-        // thrust::device_vector<float>::iterator result;
-        // result = thrust::max_element(thrust::device, layer_device.begin()+1, layer_device.end()-1);
+        thrust::transform_if(thrust::device,
+            layer_device.begin()+1, 
+            layer_device.end()-1, 
+            layer_device.begin()+2, 
+            stencil.begin(),
+            stencil.begin(),
+            thrust::greater<float>(),
+            thrust::identity<bool>()
+        );
+        thrust::device_vector<float>::iterator result;
+        thrust::device_vector<float> layer_device_tmp(layer_size-2,0);
+        thrust::transform(thrust::device,
+                    layer_device.begin()+1,
+                    layer_device.end()-1,
+                    stencil.begin(),
+                    layer_device_tmp.begin(),
+                    thrust::multiplies<float>()
+                );
+        result = thrust::max_element(thrust::device, layer_device_tmp.begin(), layer_device_tmp.end());
+        maximum[i] = *result;
+        positions[i] = thrust::distance(layer_device_tmp.begin(), result)+1;
     }
     cudaMemcpy(layer, layer_device.data().get(), layer_size*sizeof(float), cudaMemcpyDeviceToHost);
 }
