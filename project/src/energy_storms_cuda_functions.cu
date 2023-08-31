@@ -9,6 +9,7 @@
 #include <thrust/transform.h>
 #include <thrust/execution_policy.h>
 #include <thrust/functional.h>
+#include <cuda.h>
 #include "energy_storms_cuda.hpp"
 
 namespace CUDA{
@@ -37,6 +38,136 @@ struct above_threshold
     }
 };
 
+
+// TODO code from https://github.com/NVIDIA-developer-blog/code-samples/blob/master/posts/cuda-aware-mpi-example/src/Device.cu
+/**
+ * @brief Compute the maximum of 2 single-precision floating point values using an atomic operation
+ *
+ * @param[in]	address	The address of the reference value which might get updated with the maximum
+ * @param[in]	value	The value that is compared to the reference in order to determine the maximum
+ */
+__device__ void atomicMax(float* const address, const float value)
+{
+    if (*address >= value)
+    {
+        return;
+    }
+  
+    int* const addressAsInt = (int*)address;
+    int old = *addressAsInt, assumed;
+  
+    do
+    {
+        assumed = old;
+        if (__int_as_float(assumed) >= value)
+        {
+            break;
+        }
+  
+        old = atomicCAS(addressAsInt, assumed, __float_as_int(value));
+    } while (assumed != old);
+}
+
+__global__ void find_local_maximum(
+        thrust::device_vector<float>::iterator begin,
+        thrust::device_vector<float>::iterator end
+        // float& maximum,
+        // int& index
+        ){
+    float local_maximum = 0.0f;
+    int local_max_index = 0;
+    float maximum = 0.0f;
+    int index = 0;
+    thrust::device_vector<float>::iterator it = begin + threadIdx.x; //TODO remove
+    if(it > end){ //TODO remove
+        return;
+    }
+    for(thrust::device_vector<float>::iterator iterator = begin + threadIdx.x + 1;
+        iterator < (end - 1);
+        iterator += blockDim.x
+        ){
+        if(*iterator > *(iterator-1) && *iterator > *(iterator + 1)){
+            if(*iterator > local_maximum){
+                local_maximum = *iterator;
+                printf("%f \n", local_maximum); //TODO remove
+                local_max_index = thrust::distance(begin, iterator);
+                printf("%d \n", local_max_index); //TODO remove
+            }
+        }
+    }
+    printf("Hej before atomicMax\n"); //TODO remove
+    atomicMax(&maximum, local_maximum); //TODO fails here
+    printf("Hej after atomicMax\n"); //TODO remove
+  
+    __syncthreads();
+    printf("Hej after atomicMax and sync\n"); //TODO remove
+    if(maximum == local_maximum){
+        printf("From maximum found \n"); //TODO remove
+        printf("%f \n", local_maximum); //TODO remove
+        index = local_max_index;
+    }
+
+}
+
+__global__ void find_local_maximum(
+    const float* array,
+    const int& size,
+    float& maximum,
+    int& index
+    ){
+    __shared__ float local_maximum;
+    if(threadIdx.x == 0){
+        local_maximum = 0.0f;
+    }
+    __syncthreads();
+    // int local_max_index = 0;
+    int stardIdx = threadIdx.x + blockIdx.x*blockDim.x;
+    for(int i = stardIdx + 1;
+        i < (size - 1);
+        i += blockDim.x
+        ){
+        printf("index: %d \n", i); //TODO remove
+        if(array[i] > array[i-1] && array[i] > array[i+1]){
+            if(array[i] > local_maximum){
+                local_maximum = array[i];
+                atomicMax(&maximum, local_maximum);
+                if(local_maximum == maximum){
+                    atomicExch(&index, i);
+                }
+                printf("%f \n", local_maximum); //TODO remove
+                // local_max_index = i;
+                printf("%d \n", i); //TODO remove
+            }
+        }
+        printf("index after access: %d \n", i); //TODO remove
+    }
+    // printf("Hej non thrust before atomicMax\n"); //TODO remove
+    // atomicMax(&maximum, local_maximum); //TODO fails here
+    // printf("Hej after atomicMax\n"); //TODO remove
+
+    // __syncthreads();
+    // printf("Hej after atomicMax and sync\n"); //TODO remove
+    // if(maximum == local_maximum){
+    //     printf("From maximum found \n"); //TODO remove
+    //     printf("%f \n", local_maximum); //TODO remove
+    //     index = local_max_index;
+    // }
+
+}
+                                
+
+// void find_local_maximum(float* layer, const int& layer_size, float& maximum, int& position ){
+//     for(int k=1; k<layer_size-1; k++ ) {
+//         /* Check it only if it is a local maximum */
+//         if ( layer[k] > layer[k-1] && layer[k] > layer[k+1] ) {
+//             if ( layer[k] > maximum ) {
+//                 maximum = layer[k];
+//                 position = k;
+//             }
+//         }
+//     }
+// }
+
 void run_calculation(float* layer, const int& layer_size, Storm* storms, const int& num_storms,
                 float* maximum,
                 int* positions){
@@ -57,6 +188,8 @@ void run_calculation(float* layer, const int& layer_size, Storm* storms, const i
 
         /* 4.1. Add impacts energies to layer cells */
         /* For each particle */
+
+        //TODO parallize this loop more with cuda streams
         for(int j=0; j<storms[i].size; j++ ) {
             /* Get impact energy (expressed in thousandths) */
             float energy = (float)storms[i].posval[j*2+1] * 1000;
@@ -70,9 +203,9 @@ void run_calculation(float* layer, const int& layer_size, Storm* storms, const i
 
             //Update
             // float energy_k = energy / layer_size / atenuacion;
-            thrust::transform(thrust::device, //TODO 
+            thrust::transform(thrust::device,
                                 look_up_device.begin()+translated_position, 
-                                look_up_device.begin()+translated_position+layer_size-1,
+                                look_up_device.begin()+translated_position+layer_size,
                                 energy_vector_device.begin(),
                                 thrust::placeholders::_1*energy
                             );
@@ -94,7 +227,6 @@ void run_calculation(float* layer, const int& layer_size, Storm* storms, const i
                                 thrust::identity<bool>()
                             );
         }
-        
         /* 4.2. Energy relaxation between storms */
         /* 4.2.1. Copy values to the ancillary array */
         thrust::device_vector<float> layer_copy = layer_device;
@@ -118,15 +250,17 @@ void run_calculation(float* layer, const int& layer_size, Storm* storms, const i
                         (thrust::placeholders::_1 +
                         thrust::placeholders::_2)/3.0f
                     );
-        cudaMemcpy(layer, layer_device.data().get(), layer_size*sizeof(float), cudaMemcpyDeviceToHost);
+        // for(int k = 0; k < layer_size; k++){ //TODO remove
+        //     std::cout << layer_device[k] << ", ";
+        // }
+        // std::cout << std::endl;
+        // cudaMemcpy(layer, layer_device.data().get(), layer_size*sizeof(float), cudaMemcpyDeviceToHost);
         /* 4.3. Locate the maximum value in the layer, and its position */
-        thrust::device_vector<float>::iterator result;
-        result = thrust::max_element(thrust::device, layer_device.begin()+1, layer_device.end()-1);
-        maximum[i] = *result;
-        positions[i] = thrust::distance(layer_device.begin(), result);
-        // find_local_maximum(layer, layer_size, maximum[i], positions[i]); //TODO delete
+
+        // thrust::device_vector<float>::iterator result;
+        // result = thrust::max_element(thrust::device, layer_device.begin()+1, layer_device.end()-1);
     }
-    cudaMemcpy(layer_device.data().get(), layer, layer_size*sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(layer, layer_device.data().get(), layer_size*sizeof(float), cudaMemcpyDeviceToHost);
 }
 
 /* THIS FUNCTION CAN BE MODIFIED */
@@ -255,15 +389,5 @@ Storm read_storm_file(char *fname ) {
 
 // }
 
-void find_local_maximum(float* layer, const int& layer_size, float& maximum, int& position ){
-    for(int k=1; k<layer_size-1; k++ ) {
-        /* Check it only if it is a local maximum */
-        if ( layer[k] > layer[k-1] && layer[k] > layer[k+1] ) {
-            if ( layer[k] > maximum ) {
-                maximum = layer[k];
-                position = k;
-            }
-        }
-    }
-}
+
 }; //end of namespace SEQUENTIAL

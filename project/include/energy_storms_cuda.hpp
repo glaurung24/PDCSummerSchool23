@@ -4,6 +4,7 @@
 
 #define THRESHOLD    0.001f
 #define AVERAGING_WINDOW_SIZE 3
+#define THREAD_BLOCK_SIZE 256
 
 
 namespace CUDA{
@@ -28,6 +29,6 @@ Storm read_storm_file( char *fname );
 void debug_print(int layer_size, float *layer, int *positions, float *maximum, int num_storms );
 Storm read_storm_file(char *fname );
 // void energy_relaxation(thrust::device_vector<float>& layer);
-void find_local_maximum(float* layer, const int& layer_size, float& maximum, int& position );
+// void find_local_maximum(float* layer, const int& layer_size, float& maximum, int& position );
 
 }; //end of namespace CUDA
