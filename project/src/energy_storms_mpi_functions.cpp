@@ -49,7 +49,7 @@ void run_calculation(std::vector<float>& layer,
 
         /* 4.1. Add impacts energies to layer cells */
         /* For each particle */
-        for(int j=mpi_info.rank; j<storms[i].size; j += mpi_info.size ) { //TODO check if for loop breaks before j<storms[i].size
+        for(int j=mpi_info.rank; j<storms[i].size; j += mpi_info.size ) {
             /* Get impact energy (expressed in thousandths) */
             float energy = (float)storms[i].posval[j*2+1] * 1000;
             /* Get impact position */
@@ -77,14 +77,6 @@ void run_calculation(std::vector<float>& layer,
             for(int k=0; k<layer.size(); k++ ) layer[k] = 0.0f; //Reset layer in other processes
         }
     }
-    // if(mpi_info.rank == mpi_info.root){ //TODO check if this is still needed
-    //     //Error happens if pointer of layer is not original pointer
-    //     //This happens for odd numbers of storms
-    //     if(storms.size()%2){
-    //         std::vector::swap(layer, layer_sum);
-    //         layer = layer_sum;
-    //     }
-    // }
 }
 
 /* THIS FUNCTION CAN BE MODIFIED */
