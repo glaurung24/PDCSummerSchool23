@@ -3,7 +3,6 @@
 #include <vector>
 
 #define THRESHOLD    0.001f
-#define AVERAGING_WINDOW_SIZE 3
 #define MPI_ROOT_PROCESS 0
 
 
@@ -35,7 +34,7 @@ void debug_print(std::vector<float>& layer,  std::vector<int>& positions,  std::
 Storm read_storm_file( char *fname );
 void debug_print(std::vector<float>& layer, int *positions, float *maximum, int num_storms );
 Storm read_storm_file(char *fname );
-void energy_relaxation(std::vector<float>& layer, const int& windowSize);
+void energy_relaxation(std::vector<float>& layer);
 void find_local_maximum(std::vector<float>& layer, float& maximum, int& position );
 
 }; //end of namespace SEQUENTIAL

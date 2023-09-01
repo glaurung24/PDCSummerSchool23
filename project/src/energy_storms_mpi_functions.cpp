@@ -1,11 +1,12 @@
-#include<stdio.h>
-#include<stdlib.h>
+// #include<stdio.h>
+// #include<stdlib.h>
 #include<math.h>
 #include<sys/time.h>
 #include <mpi.h>
 #include <algorithm>
 #include <iterator>
 #include <vector>
+#include <iostream>
 
 
 #include "energy_storms_mpi.hpp"
@@ -41,7 +42,7 @@ void run_calculation(std::vector<float>& layer,
     }
     std::vector<float> layer_sum;
     if(mpi_info.rank == mpi_info.root){
-        layer_sum.reserve(layer.size());
+        layer_sum.resize(layer.size());
     }
     
     /* 4. Storms simulation */
@@ -62,14 +63,12 @@ void run_calculation(std::vector<float>& layer,
             }
         }
 
-
+        
         MPI_Reduce(layer.data(), layer_sum.data(), layer.size(), MPI_FLOAT, MPI_SUM, mpi_info.root, MPI_COMM_WORLD);
-
+        
         if(mpi_info.rank == mpi_info.root){
-            layer.swap(layer_sum); //Move data back to layer of root processs
-            
-            energy_relaxation(layer, AVERAGING_WINDOW_SIZE);
-
+            layer.swap(layer_sum); //Move data back to vector layer of root processs
+            energy_relaxation(layer);
             /* 4.3. Locate the maximum value in the layer, and its position */
             find_local_maximum(layer, maximum[i], positions[i]);
         }
@@ -77,14 +76,14 @@ void run_calculation(std::vector<float>& layer,
             for(int k=0; k<layer.size(); k++ ) layer[k] = 0.0f; //Reset layer in other processes
         }
     }
-    // if(mpi_info.rank == mpi_info.root){ //TODO check if this is still needed
-    //     //Error happens if pointer of layer is not original pointer
-    //     //This happens for odd numbers of storms
-    //     if(storms.size()%2){
-    //         std::vector::swap(layer, layer_sum);
-    //         layer = layer_sum;
-    //     }
-    // }
+    if(mpi_info.rank == mpi_info.root){ //TODO check if this is still needed
+        //Error happens if pointer of layer is not original pointer
+        //This happens for odd numbers of storms
+        if(storms.size()%2){
+            layer.swap(layer_sum);
+            layer = layer_sum;
+        }
+    }
 }
 
 /* THIS FUNCTION CAN BE MODIFIED */
@@ -185,16 +184,22 @@ Storm read_storm_file(char *fname ) {
 }
 
 // Energy relaxation between storms (moving average filter over windowSize elements)
-void energy_relaxation(std::vector<float>& layer, const int& windowSize){
+void energy_relaxation(std::vector<float>& layer){
         /* 4.2. Energy relaxation between storms */
         /* 4.2.1. Copy values to the ancillary array */
-        std::vector<float> layer_copy = layer; //TODO check if avoiding this malloc speeds things up
-
+        // std::vector<float> layer_copy = layer; //TODO check if avoiding this malloc speeds things up
+        if(layer.size() < 3){
+            return; //no energy relaxation if layer is too small
+        }
+        float previous = layer[0];
+        float current = layer[1];
         /* 4.2.2. Update layer using the ancillary values.
                   Skip updating the first and last positions */
-        for(int k=1; k<layer.size()-1; k++ )
-            layer[k] = ( layer_copy[k-1] + layer_copy[k] + layer_copy[k+1] ) / 3;
-
+        for(int k=1; k<layer.size()-1; k++ ){
+            current = layer[k];
+            layer[k] = (previous + current + layer[k+1] ) / 3;
+            previous = current;
+        }
 }
 
 void find_local_maximum(std::vector<float>& layer, float& maximum, int& position ){
