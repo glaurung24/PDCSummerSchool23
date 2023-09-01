@@ -66,18 +66,14 @@ int main(int argc, char *argv[]) {
     int num_storms = argc-2;
 
 
-    MPI_FUNCTIONS::Storm storms[ num_storms ];
+    std::vector<MPI_FUNCTIONS::Storm> storms( num_storms );
 
     /* 1.2. Read storms information */
-    MPI_FUNCTIONS::read_storm_files(argc, argv, storms, num_storms); //Check if reading scales with all process (i.e. if parallel read is used)
+    MPI_FUNCTIONS::read_storm_files(argc, argv, storms); //Check if reading scales with all processes (i.e. if parallel read is used)
 
     /* 1.3. Intialize maximum levels to zero */
-    float maximum[ num_storms ];
-    int positions[ num_storms ];
-    for (int i=0; i<num_storms; i++) {
-        maximum[i] = 0.0f;
-        positions[i] = 0;
-    }
+    std::vector<float> maximum( num_storms, 0.0f );
+    std::vector<int> positions( num_storms, 0.0 );
     // Print out build info
     if(mpi_info.rank == mpi_info.root){
         std::cout << "Revision: " << GIT_REV;
@@ -97,12 +93,13 @@ int main(int argc, char *argv[]) {
     }
     /* START: Do NOT optimize/parallelize the code of the main program above this point */
     /* 3. Allocate memory for the layer and initialize to zero */
-    float *layer = new float[layer_size];
-    if ( layer == NULL) {
-        fprintf(stderr,"Error: Allocating the layer memory\n");
-        MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
-    }
-    MPI_FUNCTIONS::run_calculation(layer, layer_size, storms, num_storms,
+    std::vector<float> layer(layer_size, 0.0f);
+    // if ( layer == NULL) { //TODO replace with try catch if needed
+    //     fprintf(stderr,"Error: Allocating the layer memory\n");
+    //     MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
+    // }
+    MPI_FUNCTIONS::run_calculation(layer,
+                    storms, 
                     maximum,
                     positions,
                     mpi_info);
@@ -114,7 +111,7 @@ int main(int argc, char *argv[]) {
     
         /* 6. DEBUG: Plot the result (only for layers up to 35 points) */
         #ifdef DEBUG 
-        MPI_FUNCTIONS::debug_print( layer_size, layer, positions, maximum, num_storms );
+        MPI_FUNCTIONS::debug_print(layer, positions, maximum, num_storms );
         #endif
 
         /* 7. Results output, used by the Tablon online judge software */
@@ -131,9 +128,7 @@ int main(int argc, char *argv[]) {
 
     MPI_Barrier(MPI_COMM_WORLD);
     /* 8. Free resources */    
-    for(int i=0; i<argc-2; i++ )
-        delete[] storms[i].posval;
-    delete[] layer;
+    //Not needed due to use of containers
     
     /* 9. Program ended successfully */
     MPI_Finalize();

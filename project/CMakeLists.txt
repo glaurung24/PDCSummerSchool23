@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.18)
 
-project(EnergyStorms LANGUAGES CXX CUDA)
+project(EnergyStorms LANGUAGES CXX)
 
 set(CMAKE_CXX_FLAGS_DEBUG "-g -DDEBUG -pg") # enable profiling and debug printout
 # set(CMAKE_VERBOSE_MAKEFILE ON)
@@ -120,6 +120,30 @@ if(CMAKE_CUDA_COMPILER)
                                 sequential_functions
                                 cuda_functions
         )
+        include(CTest)
+        add_test(NAME CUDA_basic_test
+        COMMAND cuda_test_run_calculation 35 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p5_w3 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p7_w2 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p8_w1 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p8_w4
+        )
+        add_test(NAME CUDA_extreme_positions_1
+                COMMAND cuda_test_run_calculation 16 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_09_a16-17_p3_w1
+        )
+        add_test(NAME CUDA_extreme_positions_2
+                COMMAND cuda_test_run_calculation 17 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_09_a16-17_p3_w1
+        )
+        add_test(NAME CUDA_test_03
+                COMMAND cuda_test_run_calculation 20 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_03_a20_p4_w1
+        )
+        add_test(NAME CUDA_test_04
+                COMMAND cuda_test_run_calculation 20 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_04_a20_p4_w1
+        )
+        add_test(NAME CUDA_test_05
+                COMMAND cuda_test_run_calculation 20 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_05_a20_p4_w1
+        )
+        add_test(NAME CUDA_test_06
+                COMMAND cuda_test_run_calculation 20 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_06_a20_p4_w1
+        )
+else()
+        message("CUDA not detected, skipping install of energy_storms_cuda")
 endif()
 
 
@@ -127,7 +151,7 @@ endif()
 
 #Set up testing
 
-include(CTest)
+
 #MPI
 # add_executable(mpi_test_run_calculation
 #         ${CMAKE_CURRENT_SOURCE_DIR}/tests/testMPIRunCalculation.cpp
@@ -141,27 +165,7 @@ include(CTest)
 
 # enable testing functionality
 # enable_testing()
-add_test(NAME CUDA_basic_test
-        COMMAND cuda_test_run_calculation 35 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p5_w3 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p7_w2 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p8_w1 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p8_w4
-)
-add_test(NAME CUDA_extreme_positions_1
-        COMMAND cuda_test_run_calculation 16 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_09_a16-17_p3_w1
-)
-add_test(NAME CUDA_extreme_positions_2
-        COMMAND cuda_test_run_calculation 17 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_09_a16-17_p3_w1
-)
-add_test(NAME CUDA_test_03
-        COMMAND cuda_test_run_calculation 20 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_03_a20_p4_w1
-)
-add_test(NAME CUDA_test_04
-        COMMAND cuda_test_run_calculation 20 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_04_a20_p4_w1
-)
-add_test(NAME CUDA_test_05
-        COMMAND cuda_test_run_calculation 20 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_05_a20_p4_w1
-)
-add_test(NAME CUDA_test_06
-        COMMAND cuda_test_run_calculation 20 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_06_a20_p4_w1
-)
+
 
 # add_test(NAME MPI_basic_test
 #         COMMAND mpiexec -np 8 mpi_test_run_calculation 35 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p5_w3 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p7_w2 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p8_w1 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p8_w4
