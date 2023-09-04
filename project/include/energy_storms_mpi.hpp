@@ -16,7 +16,6 @@ typedef struct {
 typedef struct {
     int size;
     int rank;
-    int root = MPI_ROOT_PROCESS;
 } MPIInfo;
 
 double cp_Wtime();

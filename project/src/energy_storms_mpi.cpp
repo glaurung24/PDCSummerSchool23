@@ -52,13 +52,13 @@ int main(int argc, char *argv[]) {
 
     /* 1.1. Read arguments in the root process (assuming parallel read is slow/no parallelization allowed here)*/
     bool error = false;
-    if(mpi_info.rank == mpi_info.root){
+    if(mpi_info.rank == MPI_ROOT_PROCESS){
         if (argc<3) {
             fprintf(stderr,"Usage: %s <size> <storm_1_file> [ <storm_i_file> ] ... \n", argv[0] );
             error = true;
         }
     }
-    MPI_Bcast(&error, 1, MPI_C_BOOL, mpi_info.root, MPI_COMM_WORLD); //Just to ensure all the processes get the error
+    MPI_Bcast(&error, 1, MPI_C_BOOL, MPI_ROOT_PROCESS, MPI_COMM_WORLD); //Just to ensure all the processes get the error
     if(error){
         MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
     }
@@ -75,19 +75,19 @@ int main(int argc, char *argv[]) {
     std::vector<float> maximum( num_storms, 0.0f );
     std::vector<int> positions( num_storms, 0.0 );
     // Print out build info
-    if(mpi_info.rank == mpi_info.root){
+    if(mpi_info.rank == MPI_ROOT_PROCESS){
         std::cout << "Revision: " << GIT_REV;
         std::cout << ", tag: " << GIT_TAG;
         std::cout << ", branch: " << GIT_BRANCH;
         std::cout << std::endl;
     }
     // Print out MPI info
-    if(mpi_info.rank == mpi_info.root){
+    if(mpi_info.rank == MPI_ROOT_PROCESS){
         std::cout << "Nr mpi processes: " << mpi_info.size;
         std::cout << std::endl;
     }
     MPI_Barrier(MPI_COMM_WORLD); //Barrier to ensure correct time measurement
-    if(mpi_info.rank == mpi_info.root){
+    if(mpi_info.rank == MPI_ROOT_PROCESS){
         /* 2. Begin time measurement */
         ttotal = MPI_FUNCTIONS::cp_Wtime();
     }
@@ -105,7 +105,7 @@ int main(int argc, char *argv[]) {
                     mpi_info);
     
     /* END: Do NOT optimize/parallelize the code below this point */
-    if(mpi_info.rank == mpi_info.root){
+    if(mpi_info.rank == MPI_ROOT_PROCESS){
         /* 5. End time measurement */
         ttotal = MPI_FUNCTIONS::cp_Wtime() - ttotal; //No barrier needed as only root process holds final result
     

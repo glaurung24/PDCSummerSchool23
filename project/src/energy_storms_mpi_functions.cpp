@@ -41,7 +41,7 @@ void run_calculation(std::vector<float>& layer,
         layer[k] = 0.0f;
     }
     std::vector<float> layer_sum;
-    if(mpi_info.rank == mpi_info.root){
+    if(mpi_info.rank == MPI_ROOT_PROCESS){
         layer_sum.resize(layer.size());
     }
     
@@ -64,9 +64,9 @@ void run_calculation(std::vector<float>& layer,
         }
 
         
-        MPI_Reduce(layer.data(), layer_sum.data(), layer.size(), MPI_FLOAT, MPI_SUM, mpi_info.root, MPI_COMM_WORLD);
+        MPI_Reduce(layer.data(), layer_sum.data(), layer.size(), MPI_FLOAT, MPI_SUM, MPI_ROOT_PROCESS, MPI_COMM_WORLD);
         
-        if(mpi_info.rank == mpi_info.root){
+        if(mpi_info.rank == MPI_ROOT_PROCESS){
             layer.swap(layer_sum); //Move data back to vector layer of root processs
             energy_relaxation(layer);
             /* 4.3. Locate the maximum value in the layer, and its position */
@@ -74,14 +74,6 @@ void run_calculation(std::vector<float>& layer,
         }
         else{
             for(int k=0; k<layer.size(); k++ ) layer[k] = 0.0f; //Reset layer in other processes
-        }
-    }
-    if(mpi_info.rank == mpi_info.root){ //TODO check if this is still needed
-        //Error happens if pointer of layer is not original pointer
-        //This happens for odd numbers of storms
-        if(storms.size()%2){
-            layer.swap(layer_sum);
-            layer = layer_sum;
         }
     }
 }
