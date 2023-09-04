@@ -153,25 +153,38 @@ endif()
 
 
 #MPI
-# add_executable(mpi_test_run_calculation
-#         ${CMAKE_CURRENT_SOURCE_DIR}/tests/testMPIRunCalculation.cpp
-# )
-# target_include_directories(mpi_test_run_calculation PRIVATE
-#                     ${CMAKE_CURRENT_SOURCE_DIR}/include)  
-# target_link_libraries(mpi_test_run_calculation PRIVATE
-#                             sequential_functions
-#                             mpi_functions
-# )
+include(CTest)
+add_executable(mpi_test_run_calculation
+        ${CMAKE_CURRENT_SOURCE_DIR}/tests/testMPIRunCalculation.cpp
+)
+target_include_directories(mpi_test_run_calculation PRIVATE
+                    ${CMAKE_CURRENT_SOURCE_DIR}/include)  
+target_link_libraries(mpi_test_run_calculation PRIVATE
+                            sequential_functions
+                            mpi_functions
+                            MPI::MPI_CXX
+)
 
-# enable testing functionality
-# enable_testing()
+add_test(NAME MPI_basic_test
+COMMAND mpi_test_run_calculation 35 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p5_w3 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p7_w2 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p8_w1 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p8_w4
+)
+add_test(NAME MPI_extreme_positions_1
+        COMMAND mpiexec -np 4 mpi_test_run_calculation 16 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_09_a16-17_p3_w1
+)
+add_test(NAME MPI_extreme_positions_2
+        COMMAND mpi_test_run_calculation 17 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_09_a16-17_p3_w1
+)
+add_test(NAME MPI_test_03
+        COMMAND mpi_test_run_calculation 20 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_03_a20_p4_w1
+)
+add_test(NAME MPI_test_04
+        COMMAND mpi_test_run_calculation 20 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_04_a20_p4_w1
+)
+add_test(NAME MPI_test_05
+        COMMAND mpi_test_run_calculation 20 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_05_a20_p4_w1
+)
+add_test(NAME MPI_test_06
+        COMMAND mpi_test_run_calculation 20 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_06_a20_p4_w1
+)
 
-
-# add_test(NAME MPI_basic_test
-#         COMMAND mpiexec -np 8 mpi_test_run_calculation 35 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p5_w3 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p7_w2 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p8_w1 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p8_w4
-# )
-
-# add_test(NAME mpi_test_run_calculation
-#         COMMAND mpi_test_run_calculation 100 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p5_w3
-# )
 
