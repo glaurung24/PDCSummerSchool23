@@ -30,14 +30,7 @@ void read_storm_files(int argc,
         storms[i-2] = read_storm_file( argv[i] );
 }
 
-struct above_threshold
-{
-    __host__ __device__
-    bool operator()(float x)
-    {
-        return (x*((x>=0)*1-(x<0)) > THRESHOLD);
-    }
-};
+
 
 
 // TODO code from https://github.com/NVIDIA-developer-blog/code-samples/blob/master/posts/cuda-aware-mpi-example/src/Device.cu
@@ -78,42 +71,41 @@ __global__ void find_local_maximum(
     int* index
     ){
     __shared__ float local_maximum;
-    // __shared__ float local_array[THREAD_BLOCK_SIZE];
-    // local_array[threadIdx.x] = array[threadIdx.x];
-    if(threadIdx.x == 0){
-        local_maximum = 0.0f;
+    //Add two halo cells to local array (localIdx is maximum THREAD_BLOCK_SIZE)
+    __shared__ float local_array[THREAD_BLOCK_SIZE+3];
+    int localIdx = threadIdx.x;
+    int globalIdx = threadIdx.x + blockIdx.x*blockDim.x;
+    if(globalIdx >= size ){
+        return;
     }
-    __syncthreads();
-    int startIdx = threadIdx.x + blockIdx.x*blockDim.x;
+    local_array[localIdx+1] = array[globalIdx];
+    if(localIdx == 0){
+        local_maximum = 0.0f;
+        if(globalIdx == 0){
+            return; //Prevents testing of first site
+        }else{
+            local_array[0] = array[globalIdx-1];
+        }
+        
+    }
+    if(localIdx == THREAD_BLOCK_SIZE){
+        local_array[localIdx+2] = array[globalIdx+1];
+    }
 
-    for(int i = startIdx + 1;
-        i < (size - 1);
-        i += blockDim.x
-        ){
-        if(array[i] > array[i-1] && array[i] > array[i+1]){
-            if(array[i] > local_maximum){
-                local_maximum = array[i];
-                atomicMax(maximum, local_maximum);
-                if(local_maximum == *maximum){
-                    atomicExch(index, i);
-                }
+    __syncthreads();
+    if(local_array[localIdx+1] > local_array[localIdx] &&
+         local_array[localIdx+1] > local_array[localIdx+2]
+         //Prevents the last element in layer to be eligible for local maximum
+        && globalIdx < (size -1)){
+        if(local_array[localIdx+1] > local_maximum){
+            local_maximum = local_array[localIdx+1];
+            atomicMax(maximum, local_maximum);
+            if(local_maximum == *maximum){
+                atomicExch(index, globalIdx);
             }
         }
     }
 }
-                                
-
-// void find_local_maximum(float* layer, const int& layer_size, float& maximum, int& position ){
-//     for(int k=1; k<layer_size-1; k++ ) {
-//         /* Check it only if it is a local maximum */
-//         if ( layer[k] > layer[k-1] && layer[k] > layer[k+1] ) {
-//             if ( layer[k] > maximum ) {
-//                 maximum = layer[k];
-//                 position = k;
-//             }
-//         }
-//     }
-// }
 
 void run_calculation(float* layer, const int& layer_size, Storm* storms, const int& num_storms,
                 float* maximum,
@@ -127,8 +119,8 @@ void run_calculation(float* layer, const int& layer_size, Storm* storms, const i
     }
     thrust::device_vector<float> look_up_device = look_up;
     thrust::device_vector<float> layer_device(layer_size,0);
-    thrust::device_vector<float> energy_vector_device(layer_size,0);
-    thrust::device_vector<bool> stencil(layer_size);
+    // thrust::device_vector<float> energy_vector_device(layer_size,0);
+    // thrust::device_vector<bool> stencil(layer_size);
 
     /* 4. Storms simulation */
     for(int i=0; i<num_storms; i++) {
@@ -147,31 +139,21 @@ void run_calculation(float* layer, const int& layer_size, Storm* storms, const i
                 std::cerr << "position outside of layer" << std::endl;
                 exit(EXIT_FAILURE);
             }
+            float sign = 1.0f;
+            if(energy < 0){
+                energy = abs(energy);
+                sign = -1.0;
+            }
 
             //Update
-            // float energy_k = energy / layer_size / atenuacion;
             thrust::transform(thrust::device,
                                 look_up_device.begin()+translated_position, 
                                 look_up_device.begin()+translated_position+layer_size,
-                                energy_vector_device.begin(),
-                                thrust::placeholders::_1*energy
-                            );
-            // if ( energy_k >= THRESHOLD / layer_size || energy_k <= -THRESHOLD / layer_size )
-            thrust::transform(thrust::device, 
-                                energy_vector_device.begin(),
-                                energy_vector_device.end(),
-                                stencil.begin(),
-                                above_threshold()
-                            );
-            // layer[k] = layer[k] + energy_k;
-            thrust::transform_if(thrust::device,
-                                energy_vector_device.begin(),
-                                energy_vector_device.end(),
                                 layer_device.begin(),
-                                stencil.begin(),
                                 layer_device.begin(),
-                                thrust::plus<float>(),
-                                thrust::identity<bool>()
+                                thrust::placeholders::_2 + 
+                                sign*thrust::placeholders::_1*energy*
+                                (thrust::placeholders::_1*energy > THRESHOLD) //==0 if energy[k] is below threshold
                             );
         }
         /* 4.2. Energy relaxation between storms */
@@ -197,6 +179,8 @@ void run_calculation(float* layer, const int& layer_size, Storm* storms, const i
                         (thrust::placeholders::_1 +
                         thrust::placeholders::_2)/3.0f
                     );
+
+        //Find the maximum in layer and its position
         float* maximum_device;
         int* position_device;
         cudaMalloc((void**)&maximum_device, sizeof(float));
