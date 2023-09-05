@@ -9,6 +9,7 @@
 #include <thrust/transform.h>
 #include <thrust/execution_policy.h>
 #include <thrust/functional.h>
+#include <thrust/device_ptr.h>
 #include <cuda.h>
 #include "energy_storms_cuda.hpp"
 
@@ -68,91 +69,37 @@ __device__ void atomicMax(float* const address, const float value)
     } while (assumed != old);
 }
 
+// Kernel does not work with thrust vector (not even if passing raw array)
 __global__ void find_local_maximum(
-        thrust::device_vector<float>::iterator begin,
-        thrust::device_vector<float>::iterator end
-        // float& maximum,
-        // int& index
-        ){
-    float local_maximum = 0.0f;
-    int local_max_index = 0;
-    float maximum = 0.0f;
-    int index = 0;
-    thrust::device_vector<float>::iterator it = begin + threadIdx.x; //TODO remove
-    if(it > end){ //TODO remove
-        return;
-    }
-    for(thrust::device_vector<float>::iterator iterator = begin + threadIdx.x + 1;
-        iterator < (end - 1);
-        iterator += blockDim.x
-        ){
-        if(*iterator > *(iterator-1) && *iterator > *(iterator + 1)){
-            if(*iterator > local_maximum){
-                local_maximum = *iterator;
-                printf("%f \n", local_maximum); //TODO remove
-                local_max_index = thrust::distance(begin, iterator);
-                printf("%d \n", local_max_index); //TODO remove
-            }
-        }
-    }
-    printf("Hej before atomicMax\n"); //TODO remove
-    atomicMax(&maximum, local_maximum); //TODO fails here
-    printf("Hej after atomicMax\n"); //TODO remove
-  
-    __syncthreads();
-    printf("Hej after atomicMax and sync\n"); //TODO remove
-    if(maximum == local_maximum){
-        printf("From maximum found \n"); //TODO remove
-        printf("%f \n", local_maximum); //TODO remove
-        index = local_max_index;
-    }
-
-}
-
-__global__ void find_local_maximum(
-    const float* array,
-    const int& size,
-    float& maximum,
-    int& index
+    // const thrust::device_vector<float>& array,
+    const float array[],
+    const int size,
+    float* maximum,
+    int* index
     ){
     __shared__ float local_maximum;
+    // __shared__ float local_array[THREAD_BLOCK_SIZE];
+    // local_array[threadIdx.x] = array[threadIdx.x];
     if(threadIdx.x == 0){
         local_maximum = 0.0f;
     }
     __syncthreads();
-    // int local_max_index = 0;
-    int stardIdx = threadIdx.x + blockIdx.x*blockDim.x;
-    for(int i = stardIdx + 1;
+    int startIdx = threadIdx.x + blockIdx.x*blockDim.x;
+
+    for(int i = startIdx + 1;
         i < (size - 1);
         i += blockDim.x
         ){
-        printf("index: %d \n", i); //TODO remove
         if(array[i] > array[i-1] && array[i] > array[i+1]){
             if(array[i] > local_maximum){
                 local_maximum = array[i];
-                atomicMax(&maximum, local_maximum);
-                if(local_maximum == maximum){
-                    atomicExch(&index, i);
+                atomicMax(maximum, local_maximum);
+                if(local_maximum == *maximum){
+                    atomicExch(index, i);
                 }
-                printf("%f \n", local_maximum); //TODO remove
-                // local_max_index = i;
-                printf("%d \n", i); //TODO remove
             }
         }
-        printf("index after access: %d \n", i); //TODO remove
     }
-    // printf("Hej non thrust before atomicMax\n"); //TODO remove
-    // atomicMax(&maximum, local_maximum); //TODO fails here
-    // printf("Hej after atomicMax\n"); //TODO remove
-
-    // __syncthreads();
-    // printf("Hej after atomicMax and sync\n"); //TODO remove
-    // if(maximum == local_maximum){
-    //     printf("From maximum found \n"); //TODO remove
-    //     printf("%f \n", local_maximum); //TODO remove
-    //     index = local_max_index;
-    // }
-
 }
                                 
 
@@ -250,64 +197,21 @@ void run_calculation(float* layer, const int& layer_size, Storm* storms, const i
                         (thrust::placeholders::_1 +
                         thrust::placeholders::_2)/3.0f
                     );
-        // cudaMemcpy(layer, layer_device.data().get(), layer_size*sizeof(float), cudaMemcpyDeviceToHost);
-        /* 4.3. Locate the maximum value in the layer, and its position */
-        thrust::transform(thrust::device,
-                    layer_device.begin()+1, 
-                    layer_device.end()-1, 
-                    layer_device.begin(), 
-                    stencil.begin(), 
-                    thrust::greater<float>());
+        float* maximum_device;
+        int* position_device;
+        cudaMalloc((void**)&maximum_device, sizeof(float));
+        cudaMalloc((void**)&position_device, sizeof(int));
 
-        thrust::transform_if(thrust::device,
-            layer_device.begin()+1, 
-            layer_device.end()-1, 
-            layer_device.begin()+2, 
-            stencil.begin(),
-            stencil.begin(),
-            thrust::greater<float>(),
-            thrust::identity<bool>()
-        );
-        thrust::device_vector<float>::iterator result;
-        thrust::device_vector<float> layer_device_tmp(layer_size-2,0); //vector for all local maximas
-        thrust::transform_if(thrust::device,
-                    layer_device.begin()+1,
-                    layer_device.end()-1,
-                    stencil.begin(),
-                    layer_device_tmp.begin(),
-                    thrust::identity<float>(),
-                    thrust::identity<bool>()
-                );
-        result = thrust::max_element(thrust::device, layer_device_tmp.begin(), layer_device_tmp.end());
-        maximum[i] = *result;
-        positions[i] = thrust::distance(layer_device_tmp.begin(), result)+1;
+        find_local_maximum<<<ceil(layer_size/(float)THREAD_BLOCK_SIZE), THREAD_BLOCK_SIZE>>>(thrust::raw_pointer_cast(layer_device.data()), layer_device.size(), maximum_device, position_device);
+        cudaMemcpy(maximum+i, maximum_device, sizeof(float), cudaMemcpyDeviceToHost);
+        cudaMemcpy(positions+i, position_device, sizeof(int), cudaMemcpyDeviceToHost);
+        cudaFree( maximum_device);
+        cudaFree(position_device);
+        
     }
     cudaMemcpy(layer, layer_device.data().get(), layer_size*sizeof(float), cudaMemcpyDeviceToHost);
 }
 
-/* THIS FUNCTION CAN BE MODIFIED */
-/* Function to update a single position of the layer */
-void update( float *layer, int layer_size, int k, int pos, float energy ) {
-    /* 1. Compute the absolute value of the distance between the
-        impact position and the k-th position of the layer */
-    int distance = pos - k;
-    if ( distance < 0 ) distance = - distance;
-
-    /* 2. Impact cell has a distance value of 1 */
-    distance = distance + 1;
-
-    /* 3. Square root of the distance */
-    /* NOTE: Real world atenuation typically depends on the square of the distance.
-       We use here a tailored equation that affects a much wider range of cells */
-    float atenuacion = sqrtf( (float)distance );
-
-    /* 4. Compute attenuated energy */
-    float energy_k = energy / layer_size / atenuacion;
-
-    /* 5. Do not add if its absolute value is lower than the threshold */
-    if ( energy_k >= THRESHOLD / layer_size || energy_k <= -THRESHOLD / layer_size )
-        layer[k] = layer[k] + energy_k;
-}
 
 
 /* ANCILLARY FUNCTIONS: These are not called from the code section which is measured, leave untouched */
@@ -381,35 +285,6 @@ Storm read_storm_file(char *fname ) {
 
     return storm;
 }
-
-// // Energy relaxation between storms (moving average filter over windowSize elements)
-// void energy_relaxation(thrust::device_vector<float>& layer){
-//         /* 4.2. Energy relaxation between storms */
-//         /* 4.2.1. Copy values to the ancillary array */
-//         thrust::device_vector<float> layer_copy = layer;
-
-//         /* 4.2.2. Update layer using the ancillary values.
-//                   Skip updating the first and last positions */
-//         // for(int k=1; k<layer_size-1; k++ )
-//         //     layer[k] = ( layer_copy[k-1] + layer_copy[k] + layer_copy[k+1] ) / 3;
-//         thrust::transform(thrust::device,
-//                             layer_copy.begin(), 
-//                             layer_copy.end()-2, 
-//                             layer.begin()+1, 
-//                             layer.begin()+1,
-//                             thrust::plus<float>()
-//                         );
-//         thrust::transform(thrust::device,
-//                         layer_copy.begin()+2, 
-//                         layer_copy.end(), 
-//                         layer.begin()+1, 
-//                         layer.begin()+1,
-//                         (thrust::placeholders::_1 +
-//                         thrust::placeholders::_2)/3.0f
-//                     );
-
-
-// }
 
 
 }; //end of namespace SEQUENTIAL
