@@ -4,12 +4,8 @@
 #include<sys/time.h>
 #include <vector>
 
-#include <thrust/host_vector.h>
-#include <thrust/device_vector.h>
 #include <thrust/transform.h>
 #include <thrust/execution_policy.h>
-#include <thrust/functional.h>
-#include <thrust/device_ptr.h>
 #include <cuda.h>
 #include "energy_storms_cuda.hpp"
 
@@ -30,7 +26,36 @@ void read_storm_files(int argc,
         storms[i-2] = read_storm_file( argv[i] );
 }
 
-
+// Kernel does not work with thrust vector (not even if passing raw array)
+__global__ void energy_relaxation(
+    float* array,
+    const int size
+    ){
+    //Add two halo cells to local array
+    //Acts also as a local copy
+    __shared__ float local_array[THREAD_BLOCK_SIZE+2];
+    int localIdx = threadIdx.x;
+    int globalIdx = threadIdx.x + blockIdx.x*blockDim.x;
+    if(globalIdx >= size ){
+        return;
+    }
+    local_array[localIdx+1] = array[globalIdx];
+    if(localIdx == 0){
+        if(globalIdx == 0){
+            return; //Prevents update of first site
+        }else{
+            local_array[0] = array[globalIdx-1];
+        }
+        
+    }
+    __syncthreads();
+    if(globalIdx >= (size - 1)){ //Don't update last element in layer
+        return;
+    }
+    array[globalIdx] = (local_array[localIdx] +
+                        local_array[localIdx+1] +
+                        local_array[localIdx + 2])/3;
+}
 
 
 // TODO code from https://github.com/NVIDIA-developer-blog/code-samples/blob/master/posts/cuda-aware-mpi-example/src/Device.cu
@@ -62,17 +87,15 @@ __device__ void atomicMax(float* const address, const float value)
     } while (assumed != old);
 }
 
-// Kernel does not work with thrust vector (not even if passing raw array)
 __global__ void find_local_maximum(
-    // const thrust::device_vector<float>& array,
     const float array[],
     const int size,
     float* maximum,
     int* index
     ){
     __shared__ float local_maximum;
-    //Add two halo cells to local array (localIdx is maximum THREAD_BLOCK_SIZE)
-    __shared__ float local_array[THREAD_BLOCK_SIZE+3];
+    //Add two halo cells to local array
+    __shared__ float local_array[THREAD_BLOCK_SIZE+2];
     int localIdx = threadIdx.x;
     int globalIdx = threadIdx.x + blockIdx.x*blockDim.x;
     if(globalIdx >= size ){
@@ -88,10 +111,6 @@ __global__ void find_local_maximum(
         }
         
     }
-    if(localIdx == THREAD_BLOCK_SIZE){
-        local_array[localIdx+2] = array[globalIdx+1];
-    }
-
     __syncthreads();
     if(local_array[localIdx+1] > local_array[localIdx] &&
          local_array[localIdx+1] > local_array[localIdx+2]
@@ -107,20 +126,34 @@ __global__ void find_local_maximum(
     }
 }
 
+//Note: size is half of the dimension of array!
+__global__ void generate_look_up(
+    float array[],
+    const int size
+    ){
+    for(int i = threadIdx.x + blockIdx.x*blockDim.x;
+        i<2*size;
+        i+=blockDim.x * gridDim.x){
+        array[i] = (1.0f/sqrtf((float)abs(size-i)+1.0f)/(float)size);
+    }
+}
+
 void run_calculation(float* layer, const int& layer_size, Storm* storms, const int& num_storms,
                 float* maximum,
                 int* positions){
+
+    float* look_up_device;
+    float* layer_device;
+    //Allocate device memory
+    cudaMalloc((void**)&look_up_device, 2*sizeof(float)*layer_size);
+    cudaMalloc((void**)&layer_device, sizeof(float)*layer_size);
+    //Initialize layer_device
+    cudaMemset(layer_device, 0.0f, sizeof(float)*layer_size);
+    //generate lookup on device
     //lookup table for prefactor 1/sqrt(distance)/layer_size
     //It needs to be 2*layer_size to fit 
-    thrust::host_vector<float> look_up;
-    look_up.reserve(2*layer_size);
-    for(int i = 0; i<2*layer_size; i++){
-        look_up.push_back(1.0f/sqrtf((float)abs(layer_size-i)+1)/(float)layer_size); //TODO this should be done on the gpu
-    }
-    thrust::device_vector<float> look_up_device = look_up;
-    thrust::device_vector<float> layer_device(layer_size,0);
-    // thrust::device_vector<float> energy_vector_device(layer_size,0);
-    // thrust::device_vector<bool> stencil(layer_size);
+    int nr_blocks = ceil(2*layer_size/(float)THREAD_BLOCK_SIZE);
+    generate_look_up<<<nr_blocks, THREAD_BLOCK_SIZE>>>(look_up_device, layer_size);
 
     /* 4. Storms simulation */
     for(int i=0; i<num_storms; i++) {
@@ -133,10 +166,12 @@ void run_calculation(float* layer, const int& layer_size, Storm* storms, const i
             /* Get impact energy (expressed in thousandths) */
             float energy = (float)storms[i].posval[j*2+1] * 1000;
             /* Get impact position */
-            int position = storms[i].posval[j*2]; //TODO check if position is outside of range
+            int position = storms[i].posval[j*2];
             int translated_position = layer_size-position; //relative position to find right part of lookup
-            if(translated_position+layer_size > 2*layer_size){
+            if(position >= layer_size){
                 std::cerr << "position outside of layer" << std::endl;
+                cudaFree(layer_device);
+                cudaFree(look_up_device);
                 exit(EXIT_FAILURE);
             }
             float sign = 1.0f;
@@ -144,41 +179,25 @@ void run_calculation(float* layer, const int& layer_size, Storm* storms, const i
                 energy = abs(energy);
                 sign = -1.0;
             }
-
             //Update
-            thrust::transform(thrust::device,
-                                look_up_device.begin()+translated_position, 
-                                look_up_device.begin()+translated_position+layer_size,
-                                layer_device.begin(),
-                                layer_device.begin(),
-                                thrust::placeholders::_2 + 
-                                sign*thrust::placeholders::_1*energy*
-                                (thrust::placeholders::_1*energy > THRESHOLD) //==0 if energy[k] is below threshold
-                            );
-        }
+                thrust::transform(thrust::device,
+                    look_up_device+translated_position, 
+                    look_up_device+translated_position+layer_size,
+                    layer_device,
+                    layer_device,
+                    thrust::placeholders::_2 + 
+                    sign*thrust::placeholders::_1*energy*
+                    (thrust::placeholders::_1*energy > THRESHOLD) //==0 if energy[k] is below threshold
+                );
+            }
         /* 4.2. Energy relaxation between storms */
-        /* 4.2.1. Copy values to the ancillary array */
-        thrust::device_vector<float> layer_copy = layer_device;
+        /* 4.2.1. Copy values to the ancillary array (now done in cuda __shared__ memory*/
 
         /* 4.2.2. Update layer using the ancillary values.
                   Skip updating the first and last positions */
-        // for(int k=1; k<layer_size-1; k++ )
-        //     layer[k] = ( layer_copy[k-1] + layer_copy[k] + layer_copy[k+1] ) / 3;
-        thrust::transform(thrust::device,
-                            layer_copy.begin(), 
-                            layer_copy.end()-2, 
-                            layer_device.begin()+1, 
-                            layer_device.begin()+1,
-                            thrust::plus<float>()
-                        );
-        thrust::transform(thrust::device,
-                        layer_copy.begin()+2, 
-                        layer_copy.end(), 
-                        layer_device.begin()+1, 
-                        layer_device.begin()+1,
-                        (thrust::placeholders::_1 +
-                        thrust::placeholders::_2)/3.0f
-                    );
+        
+        nr_blocks = ceil(layer_size/(float)THREAD_BLOCK_SIZE);
+        energy_relaxation<<<nr_blocks, THREAD_BLOCK_SIZE>>>(layer_device, layer_size);
 
         //Find the maximum in layer and its position
         float* maximum_device;
@@ -186,14 +205,18 @@ void run_calculation(float* layer, const int& layer_size, Storm* storms, const i
         cudaMalloc((void**)&maximum_device, sizeof(float));
         cudaMalloc((void**)&position_device, sizeof(int));
 
-        find_local_maximum<<<ceil(layer_size/(float)THREAD_BLOCK_SIZE), THREAD_BLOCK_SIZE>>>(thrust::raw_pointer_cast(layer_device.data()), layer_device.size(), maximum_device, position_device);
+        find_local_maximum<<<nr_blocks, THREAD_BLOCK_SIZE>>>(layer_device, layer_size, maximum_device, position_device);
+ 
+        //Copy maximum and positions into corresponding host memory
         cudaMemcpy(maximum+i, maximum_device, sizeof(float), cudaMemcpyDeviceToHost);
         cudaMemcpy(positions+i, position_device, sizeof(int), cudaMemcpyDeviceToHost);
         cudaFree( maximum_device);
         cudaFree(position_device);
         
     }
-    cudaMemcpy(layer, layer_device.data().get(), layer_size*sizeof(float), cudaMemcpyDeviceToHost);
+    cudaMemcpy(layer, layer_device, layer_size*sizeof(float), cudaMemcpyDeviceToHost);
+    cudaFree(layer_device);
+    cudaFree(look_up_device);
 }
 
 
