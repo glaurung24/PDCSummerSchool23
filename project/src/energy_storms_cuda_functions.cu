@@ -116,12 +116,15 @@ __global__ void find_local_maximum(
          local_array[localIdx+1] > local_array[localIdx+2]
          //Prevents the last element in layer to be eligible for local maximum
         && globalIdx < (size -1)){
+        //First check if found maximum is larger than the maximum in local memory
+        //to avoid unneccesary calls to atomicMax 
         if(local_array[localIdx+1] > local_maximum){
             local_maximum = local_array[localIdx+1];
             atomicMax(maximum, local_maximum);
             if(local_maximum == *maximum){
                 atomicExch(index, globalIdx);
             }
+
         }
     }
 }
@@ -145,8 +148,17 @@ void run_calculation(float* layer, const int& layer_size, Storm* storms, const i
     float* look_up_device;
     float* layer_device;
     //Allocate device memory
-    cudaMalloc((void**)&look_up_device, 2*sizeof(float)*layer_size);
-    cudaMalloc((void**)&layer_device, sizeof(float)*layer_size);
+    if(cudaMalloc((void**)&look_up_device, 2*sizeof(float)*layer_size)
+        != cudaSuccess ){
+        std::cerr << "Error during allocation of device memory" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+    if(cudaMalloc((void**)&layer_device, sizeof(float)*layer_size)
+        != cudaSuccess ){
+        std::cerr << "Error during allocation of device memory" << std::endl;
+        cudaFree( look_up_device);
+        exit(EXIT_FAILURE);
+    }
     //Initialize layer_device
     cudaMemset(layer_device, 0.0f, sizeof(float)*layer_size);
     //generate lookup on device
@@ -160,8 +172,6 @@ void run_calculation(float* layer, const int& layer_size, Storm* storms, const i
 
         /* 4.1. Add impacts energies to layer cells */
         /* For each particle */
-
-        //TODO parallize this loop more with cuda streams
         for(int j=0; j<storms[i].size; j++ ) {
             /* Get impact energy (expressed in thousandths) */
             float energy = (float)storms[i].posval[j*2+1] * 1000;
