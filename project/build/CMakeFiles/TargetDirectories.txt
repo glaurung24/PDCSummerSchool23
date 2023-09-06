@@ -1,6 +1,0 @@
-/cfs/klemming/home/e/edwardgl/project/build/CMakeFiles/rebuild_cache.dir
-/cfs/klemming/home/e/edwardgl/project/build/CMakeFiles/energy_storms_omp.dir
-/cfs/klemming/home/e/edwardgl/project/build/CMakeFiles/omp_functions.dir
-/cfs/klemming/home/e/edwardgl/project/build/CMakeFiles/edit_cache.dir
-/cfs/klemming/home/e/edwardgl/project/build/CMakeFiles/energy_storms_seq.dir
-/cfs/klemming/home/e/edwardgl/project/build/CMakeFiles/sequential_functions.dir

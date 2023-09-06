@@ -1,1 +1,0 @@
-/opt/cray/pe/craype/2.7.16/bin/CC  -O3   CMakeFiles/energy_storms_omp.dir/src/energy_storms_omp.cpp.o  -o energy_storms_omp 

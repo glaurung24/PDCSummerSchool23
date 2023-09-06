@@ -1,1 +1,0 @@
-/opt/cray/pe/craype/2.7.16/bin/CC  -O3   CMakeFiles/energy_storms_seq.dir/src/energy_storms_sequential.cpp.o  -o energy_storms_seq  -Wl,-rpath,/cfs/klemming/home/e/edwardgl/project/build libsequential_functions.so 

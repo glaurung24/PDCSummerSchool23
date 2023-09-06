@@ -1,1 +1,0 @@
-/opt/cray/pe/craype/2.7.16/bin/CC -fPIC -O3  -shared -Wl,-soname,libomp_functions.so -o libomp_functions.so CMakeFiles/omp_functions.dir/src/energy_storms_omp_functions.cpp.o 
