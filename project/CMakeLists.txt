@@ -1,6 +1,6 @@
-cmake_minimum_required(VERSION 3.18)
+cmake_minimum_required(VERSION 3.17)
 
-project(EnergyStorms LANGUAGES CXX CUDA)
+project(EnergyStorms LANGUAGES CXX)
 
 set(CMAKE_CXX_FLAGS_DEBUG "-g -DDEBUG -pg") # enable profiling and debug printout
 # set(CMAKE_VERBOSE_MAKEFILE ON)
@@ -69,105 +69,55 @@ target_link_libraries(energy_storms_seq PUBLIC
 target_include_directories(energy_storms_seq PRIVATE
                 ${CMAKE_CURRENT_SOURCE_DIR}/include) 
 
-#mpi program
-find_package(MPI REQUIRED)
-# message(STATUS "Run: ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${MPIEXEC_MAX_NUMPROCS} ${MPIEXEC_PREFLAGS} EXECUTABLE ${MPIEXEC_POSTFLAGS} ARGS")
+# OpenMP program
+find_package(OpenMP REQUIRED)
 
-add_library(mpi_functions SHARED 
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/energy_storms_mpi_functions.cpp)  
-target_include_directories(mpi_functions PRIVATE
-                    ${CMAKE_CURRENT_SOURCE_DIR}/include)        
-add_executable(energy_storms_mpi
-                src/energy_storms_mpi.cpp
-                )
-target_link_libraries(energy_storms_mpi PUBLIC
-                    mpi_functions MPI::MPI_CXX)   
-target_include_directories(energy_storms_mpi PRIVATE
+add_library(omp_functions SHARED 
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/energy_storms_omp_functions.cpp)
+
+target_include_directories(omp_functions PRIVATE
+                    ${CMAKE_CURRENT_SOURCE_DIR}/include) 
+
+add_executable(energy_storms_omp
+                src/energy_storms_omp.cpp)
+
+# Link the energy_storms_omp executable with omp_functions library and OpenMP
+target_link_libraries(energy_storms_omp PRIVATE omp_functions OpenMP::OpenMP_CXX)
+
+
+target_include_directories(energy_storms_omp PRIVATE
                 ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-#cuda program
-include(CheckLanguage)
-check_language(CUDA)
-if(CMAKE_CUDA_COMPILER)
-        enable_language(CUDA)
-        if(NOT DEFINED CMAKE_CUDA_STANDARD)
-                set(CMAKE_CUDA_STANDARD 17)
-                set(CMAKE_CUDA_STANDARD_REQUIRED ON)
-        endif()
-        add_library(cuda_functions SHARED 
-                ${CMAKE_CURRENT_SOURCE_DIR}/src/energy_storms_cuda_functions.cu)
-        set_target_properties(cuda_functions PROPERTIES
-                CUDA_SEPARABLE_COMPILATION ON
-                CUDA_ARCHITECTURES native)
-        target_include_directories(cuda_functions PRIVATE
-                        CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES
-                        ${CMAKE_CURRENT_SOURCE_DIR}/include
-                        CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES)    
-        add_executable(energy_storms_cuda
-                        src/energy_storms_cuda.cpp
-                        )
-        target_link_libraries(energy_storms_cuda PUBLIC
-                        cuda_functions)   
-        target_include_directories(energy_storms_cuda PRIVATE
-                        ${CMAKE_CURRENT_SOURCE_DIR}/include)
-        # CUDA Test executable
-        add_executable(cuda_test_run_calculation
-                ${CMAKE_CURRENT_SOURCE_DIR}/tests/testCUDARunCalculation.cpp
-        )
-        target_include_directories(cuda_test_run_calculation PRIVATE
-                        ${CMAKE_CURRENT_SOURCE_DIR}/include)  
-        target_link_libraries(cuda_test_run_calculation PRIVATE
-                                sequential_functions
-                                cuda_functions
-        )
-endif()
-
-
-
-
-#Set up testing
+# OMP Test executable
+add_executable(omp_test_run_calculation
+        ${CMAKE_CURRENT_SOURCE_DIR}/tests/testOMPRunCalculation.cpp
+)
+target_include_directories(omp_test_run_calculation PRIVATE
+                ${CMAKE_CURRENT_SOURCE_DIR}/include)  
+target_link_libraries(omp_test_run_calculation PRIVATE
+                        sequential_functions
+                        omp_functions)
 
 include(CTest)
-#MPI
-# add_executable(mpi_test_run_calculation
-#         ${CMAKE_CURRENT_SOURCE_DIR}/tests/testMPIRunCalculation.cpp
-# )
-# target_include_directories(mpi_test_run_calculation PRIVATE
-#                     ${CMAKE_CURRENT_SOURCE_DIR}/include)  
-# target_link_libraries(mpi_test_run_calculation PRIVATE
-#                             sequential_functions
-#                             mpi_functions
-# )
 
-# enable testing functionality
-# enable_testing()
-add_test(NAME CUDA_basic_test
-        COMMAND cuda_test_run_calculation 35 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p5_w3 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p7_w2 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p8_w1 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p8_w4
+add_test(NAME OMP_basic_test
+        COMMAND omp_test_run_calculation 35 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p5_w3 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p7_w2 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p8_w1 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p8_w4
 )
-add_test(NAME CUDA_extreme_positions_1
-        COMMAND cuda_test_run_calculation 16 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_09_a16-17_p3_w1
+add_test(NAME OMP_extreme_positions_1
+        COMMAND omp_test_run_calculation 16 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_09_a16-17_p3_w1
 )
-add_test(NAME CUDA_extreme_positions_2
-        COMMAND cuda_test_run_calculation 17 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_09_a16-17_p3_w1
+add_test(NAME OMP_extreme_positions_2
+        COMMAND omp_test_run_calculation 17 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_09_a16-17_p3_w1
 )
-add_test(NAME CUDA_test_03
-        COMMAND cuda_test_run_calculation 20 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_03_a20_p4_w1
+add_test(NAME OMP_test_03
+        COMMAND omp_test_run_calculation 20 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_03_a20_p4_w1
 )
-add_test(NAME CUDA_test_04
-        COMMAND cuda_test_run_calculation 20 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_04_a20_p4_w1
+add_test(NAME OMP_test_04
+        COMMAND omp_test_run_calculation 20 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_04_a20_p4_w1
 )
-add_test(NAME CUDA_test_05
-        COMMAND cuda_test_run_calculation 20 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_05_a20_p4_w1
+add_test(NAME OMP_test_05
+        COMMAND omp_test_run_calculation 20 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_05_a20_p4_w1
 )
-add_test(NAME CUDA_test_06
-        COMMAND cuda_test_run_calculation 20 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_06_a20_p4_w1
+add_test(NAME OMP_test_06
+        COMMAND omp_test_run_calculation 20 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_06_a20_p4_w1
 )
-
-# add_test(NAME MPI_basic_test
-#         COMMAND mpiexec -np 8 mpi_test_run_calculation 35 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p5_w3 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p7_w2 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p8_w1 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p8_w4
-# )
-
-# add_test(NAME mpi_test_run_calculation
-#         COMMAND mpi_test_run_calculation 100 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p5_w3
-# )
-

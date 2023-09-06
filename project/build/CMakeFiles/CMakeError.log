@@ -1,0 +1,46 @@
+Detecting CXX OpenMP failed with the following output:
+Change Dir: /cfs/klemming/home/e/edwardgl/project/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake cmTC_60d5c/fast && /usr/bin/gmake -f CMakeFiles/cmTC_60d5c.dir/build.make CMakeFiles/cmTC_60d5c.dir/build
+gmake[1]: Entering directory '/cfs/klemming/home/e/edwardgl/project/build/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_60d5c.dir/OpenMPTryFlag.cpp.o
+/opt/cray/pe/craype/2.7.16/bin/CC    -fopenmp=libomp -v   -std=c++17 -o CMakeFiles/cmTC_60d5c.dir/OpenMPTryFlag.cpp.o -c /cfs/klemming/home/e/edwardgl/project/build/CMakeFiles/FindOpenMP/OpenMPTryFlag.cpp
+Cray clang version 14.0.1  (3a8780657c742829e80f36338fb6ec6578642bb7)
+Target: x86_64-unknown-linux-gnu
+Thread model: posix
+InstalledDir: /opt/cray/pe/cce/14.0.1/cce-clang/x86_64/share/../bin
+Found candidate GCC installation: /opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0
+Selected GCC installation: /opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0
+Candidate multilib: .;@m64
+Selected multilib: .;@m64
+Found HIP installation: /opt/rocm-5.3.3, version 5.3.22062
+clang-14: error: -fopenmp=libomp should be used with -fno-cray or -fno-cray-openmp
+gmake[1]: *** [CMakeFiles/cmTC_60d5c.dir/build.make:83: CMakeFiles/cmTC_60d5c.dir/OpenMPTryFlag.cpp.o] Error 1
+gmake[1]: Leaving directory '/cfs/klemming/home/e/edwardgl/project/build/CMakeFiles/CMakeTmp'
+gmake: *** [Makefile:138: cmTC_60d5c/fast] Error 2
+
+
+
+Detecting CXX OpenMP failed with the following output:
+Change Dir: /cfs/klemming/home/e/edwardgl/project/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake cmTC_ac647/fast && /usr/bin/gmake -f CMakeFiles/cmTC_ac647.dir/build.make CMakeFiles/cmTC_ac647.dir/build
+gmake[1]: Entering directory '/cfs/klemming/home/e/edwardgl/project/build/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_ac647.dir/OpenMPTryFlag.cpp.o
+/opt/cray/pe/craype/2.7.16/bin/CC    -fopenmp=libiomp5 -v   -std=c++17 -o CMakeFiles/cmTC_ac647.dir/OpenMPTryFlag.cpp.o -c /cfs/klemming/home/e/edwardgl/project/build/CMakeFiles/FindOpenMP/OpenMPTryFlag.cpp
+Cray clang version 14.0.1  (3a8780657c742829e80f36338fb6ec6578642bb7)
+Target: x86_64-unknown-linux-gnu
+Thread model: posix
+InstalledDir: /opt/cray/pe/cce/14.0.1/cce-clang/x86_64/share/../bin
+Found candidate GCC installation: /opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0
+Selected GCC installation: /opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0
+Candidate multilib: .;@m64
+Selected multilib: .;@m64
+Found HIP installation: /opt/rocm-5.3.3, version 5.3.22062
+clang-14: error: -fopenmp=libomp should be used with -fno-cray or -fno-cray-openmp
+gmake[1]: *** [CMakeFiles/cmTC_ac647.dir/build.make:83: CMakeFiles/cmTC_ac647.dir/OpenMPTryFlag.cpp.o] Error 1
+gmake[1]: Leaving directory '/cfs/klemming/home/e/edwardgl/project/build/CMakeFiles/CMakeTmp'
+gmake: *** [Makefile:138: cmTC_ac647/fast] Error 2
+
+
+

@@ -1,0 +1,1 @@
+/opt/cray/pe/craype/2.7.16/bin/CC -fPIC -O3  -shared -Wl,-soname,libsequential_functions.so -o libsequential_functions.so CMakeFiles/sequential_functions.dir/src/energy_storms_sequential_functions.cpp.o 

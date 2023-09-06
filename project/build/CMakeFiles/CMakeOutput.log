@@ -1,0 +1,481 @@
+The system is: Linux - 5.3.18-150300.59.76_11.0.53-cray_shasta_c - x86_64
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" succeeded.
+Compiler: /opt/cray/pe/craype/2.7.16/bin/CC 
+Build flags: 
+Id flags:  
+
+The output was:
+0
+
+
+Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "a.out"
+
+The CXX compiler identification is Clang, found in "/cfs/klemming/home/e/edwardgl/project/build/CMakeFiles/3.17.0/CompilerIdCXX/a.out"
+
+Determining if the CXX compiler works passed with the following output:
+Change Dir: /cfs/klemming/home/e/edwardgl/project/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake cmTC_128db/fast && /usr/bin/gmake -f CMakeFiles/cmTC_128db.dir/build.make CMakeFiles/cmTC_128db.dir/build
+gmake[1]: Entering directory '/cfs/klemming/home/e/edwardgl/project/build/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_128db.dir/testCXXCompiler.cxx.o
+/opt/cray/pe/craype/2.7.16/bin/CC     -o CMakeFiles/cmTC_128db.dir/testCXXCompiler.cxx.o -c /cfs/klemming/home/e/edwardgl/project/build/CMakeFiles/CMakeTmp/testCXXCompiler.cxx
+Linking CXX executable cmTC_128db
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_128db.dir/link.txt --verbose=1
+/opt/cray/pe/craype/2.7.16/bin/CC       CMakeFiles/cmTC_128db.dir/testCXXCompiler.cxx.o  -o cmTC_128db 
+gmake[1]: Leaving directory '/cfs/klemming/home/e/edwardgl/project/build/CMakeFiles/CMakeTmp'
+
+
+
+Detecting CXX compiler ABI info compiled with the following output:
+Change Dir: /cfs/klemming/home/e/edwardgl/project/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake cmTC_10a77/fast && /usr/bin/gmake -f CMakeFiles/cmTC_10a77.dir/build.make CMakeFiles/cmTC_10a77.dir/build
+gmake[1]: Entering directory '/cfs/klemming/home/e/edwardgl/project/build/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_10a77.dir/CMakeCXXCompilerABI.cpp.o
+/opt/cray/pe/craype/2.7.16/bin/CC    -v -o CMakeFiles/cmTC_10a77.dir/CMakeCXXCompilerABI.cpp.o -c /usr/share/cmake/Modules/CMakeCXXCompilerABI.cpp
+Cray clang version 14.0.1  (3a8780657c742829e80f36338fb6ec6578642bb7)
+Target: x86_64-unknown-linux-gnu
+Thread model: posix
+InstalledDir: /opt/cray/pe/cce/14.0.1/cce-clang/x86_64/share/../bin
+Found candidate GCC installation: /opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0
+Selected GCC installation: /opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0
+Candidate multilib: .;@m64
+Selected multilib: .;@m64
+Found HIP installation: /opt/rocm-5.3.3, version 5.3.22062
+ (in-process)
+ "/opt/cray/pe/cce/14.0.1/cce-clang/x86_64/bin/clang-14" -cc1 -triple x86_64-unknown-linux-gnu -mllvm -cray-omp-opt-fork-call -mllvm -cray-omp-parallel-opt-call -mllvm -cray-openmp-rename-outlined -fcray-gpu -flocal-restrict -mllvm -cray-enhanced-asm=1 -fenhanced-asm=1 -mllvm -cray-enhanced-ir=1 -fenhanced-ir=1 -fomp-local-offload-table -ffortran -emit-obj -mrelax-all --mrelax-relocations -disable-free -clear-ast-before-backend -main-file-name CMakeCXXCompilerABI.cpp -mrelocation-model static -mframe-pointer=all -fmath-errno -ffp-contract=on -fno-rounding-math -mconstructor-aliases -funwind-tables=2 -target-cpu znver2 -mllvm -treat-scalable-fixed-error-as-warning -debugger-tuning=gdb -v -fcoverage-compilation-dir=/cfs/klemming/home/e/edwardgl/project/build/CMakeFiles/CMakeTmp -resource-dir /opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/clang/14.0.1 -isystem /opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/clang/14.0.1/include -isystem /opt/cray/pe/cce/14.0.1/cce/x86_64/include/craylibs -D __CRAY_X86_ROME -D __CRAYXT_COMPUTE_LINUX_TARGET -I /opt/cray/pe/mpich/8.1.17/ofi/cray/10.0/include -I /opt/cray/pe/libsci/21.08.1.2/CRAY/9.0/x86_64/include -I /opt/cray/pe/dsmml/0.2.2/dsmml//include -I /opt/cray/xpmem/2.3.2-2.2_9.4__g93dd7ee.shasta/include -internal-isystem /opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0/../../../../include/g++ -internal-isystem /opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0/../../../../include/g++/x86_64-suse-linux -internal-isystem /opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0/../../../../include/g++/backward -internal-isystem /opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/clang/14.0.1/include -internal-isystem /usr/local/include -internal-isystem /opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0/../../../../x86_64-suse-linux/include -internal-externc-isystem /include -internal-externc-isystem /usr/include -fdeprecated-macro -fdebug-compilation-dir=/cfs/klemming/home/e/edwardgl/project/build/CMakeFiles/CMakeTmp -ferror-limit 19 -fgnuc-version=4.2.1 -fcxx-exceptions -fexceptions -faddrsig -D__GCC_HAVE_DWARF2_CFI_ASM=1 -o CMakeFiles/cmTC_10a77.dir/CMakeCXXCompilerABI.cpp.o -x c++ /usr/share/cmake/Modules/CMakeCXXCompilerABI.cpp
+clang -cc1 version 14.0.1 based upon LLVM 14.0.1 default target x86_64-unknown-linux-gnu
+ignoring nonexistent directory "/opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0/../../../../x86_64-suse-linux/include"
+ignoring nonexistent directory "/include"
+ignoring duplicate directory "/opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/clang/14.0.1/include"
+#include "..." search starts here:
+#include <...> search starts here:
+ /opt/cray/pe/mpich/8.1.17/ofi/cray/10.0/include
+ /opt/cray/pe/libsci/21.08.1.2/CRAY/9.0/x86_64/include
+ /opt/cray/pe/dsmml/0.2.2/dsmml//include
+ /opt/cray/xpmem/2.3.2-2.2_9.4__g93dd7ee.shasta/include
+ /opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/clang/14.0.1/include
+ /opt/cray/pe/cce/14.0.1/cce/x86_64/include/craylibs
+ /opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0/../../../../include/g++
+ /opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0/../../../../include/g++/x86_64-suse-linux
+ /opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0/../../../../include/g++/backward
+ /usr/local/include
+ /usr/include
+End of search list.
+Linking CXX executable cmTC_10a77
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_10a77.dir/link.txt --verbose=1
+/opt/cray/pe/craype/2.7.16/bin/CC      -v CMakeFiles/cmTC_10a77.dir/CMakeCXXCompilerABI.cpp.o  -o cmTC_10a77 
+Cray clang version 14.0.1  (3a8780657c742829e80f36338fb6ec6578642bb7)
+Target: x86_64-unknown-linux-gnu
+Thread model: posix
+InstalledDir: /opt/cray/pe/cce/14.0.1/cce-clang/x86_64/share/../bin
+Found candidate GCC installation: /opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0
+Selected GCC installation: /opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0
+Candidate multilib: .;@m64
+Selected multilib: .;@m64
+Found HIP installation: /opt/rocm-5.3.3, version 5.3.22062
+ "/opt/cray/pe/cce/14.0.1/cce-clang/x86_64/share/../bin/ld.lld" --eh-frame-hdr -m elf_x86_64 -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTC_10a77 /usr/lib/../lib64/crt1.o /usr/lib/../lib64/crti.o /opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/clang/14.0.1/lib/linux/clang_rt.crtbegin-x86_64.o -L/opt/cray/pe/mpich/8.1.17/ofi/cray/10.0/lib -L/opt/cray/pe/libsci/21.08.1.2/CRAY/9.0/x86_64/lib -L/opt/cray/pe/dsmml/0.2.2/dsmml//lib -L/opt/cray/pe/cce/14.0.1/cce/x86_64/lib/pkgconfig/../ -L/opt/gcc/10.3.0/snos/lib64 -L/opt/cray/pe/gcc/10.3.0/snos/lib64 -L/opt/cray/pe/cce/14.0.1/cce/x86_64/lib/pkgconfig/../ -L/opt/cray/xpmem/2.3.2-2.2_9.4__g93dd7ee.shasta/lib64 -L/opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0 -L/opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0/../../../../lib64 -L/lib/../lib64 -L/usr/lib/../lib64 -L/opt/cray/pe/cce/14.0.1/cce-clang/x86_64/bin/../lib -L/lib -L/usr/lib -plugin-opt=mcpu=znver2 -plugin-opt=lto=0 -plugin-opt=defaults=cray -plugin-opt=mllvm=-cray-math-precision=none -rpath=/opt/cray/pe/cce/14.0.1/cce/x86_64/lib -rpath=/opt/cray/pe/gcc-libs CMakeFiles/cmTC_10a77.dir/CMakeCXXCompilerABI.cpp.o --as-needed -lmpi_cray --no-as-needed --as-needed -lsci_cray_mpi --no-as-needed --as-needed -lsci_cray --no-as-needed -ldl --as-needed -ldsmml --no-as-needed -lxpmem --as-needed -lstdc++ --no-as-needed --as-needed -lpgas-shmem --no-as-needed -lquadmath -lmodules -lfi -lcraymath -lf -lu -lcsup --as-needed -lpthread -latomic --no-as-needed --as-needed -lm --no-as-needed --disable-new-dtags /opt/cray/pe/cce/14.0.1/cce/x86_64/lib/no_mmap.o -lstdc++ -lm /opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/clang/14.0.1/lib/linux/libclang_rt.builtins-x86_64.a -rpath=/opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib /opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/libunwind.so -l:libunwind.so -lc /opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/clang/14.0.1/lib/linux/libclang_rt.builtins-x86_64.a -rpath=/opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib /opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/libunwind.so -l:libunwind.so /opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/clang/14.0.1/lib/linux/clang_rt.crtend-x86_64.o /usr/lib/../lib64/crtn.o
+gmake[1]: Leaving directory '/cfs/klemming/home/e/edwardgl/project/build/CMakeFiles/CMakeTmp'
+
+
+
+Parsed CXX implicit include dir info from above output: rv=done
+  found start of include info
+  found start of implicit include info
+    add: [/opt/cray/pe/mpich/8.1.17/ofi/cray/10.0/include]
+    add: [/opt/cray/pe/libsci/21.08.1.2/CRAY/9.0/x86_64/include]
+    add: [/opt/cray/pe/dsmml/0.2.2/dsmml//include]
+    add: [/opt/cray/xpmem/2.3.2-2.2_9.4__g93dd7ee.shasta/include]
+    add: [/opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/clang/14.0.1/include]
+    add: [/opt/cray/pe/cce/14.0.1/cce/x86_64/include/craylibs]
+    add: [/opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0/../../../../include/g++]
+    add: [/opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0/../../../../include/g++/x86_64-suse-linux]
+    add: [/opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0/../../../../include/g++/backward]
+    add: [/usr/local/include]
+    add: [/usr/include]
+  end of search list found
+  collapse include dir [/opt/cray/pe/mpich/8.1.17/ofi/cray/10.0/include] ==> [/opt/cray/pe/mpich/8.1.17/ofi/cray/10.0/include]
+  collapse include dir [/opt/cray/pe/libsci/21.08.1.2/CRAY/9.0/x86_64/include] ==> [/opt/cray/pe/libsci/21.08.1.2/CRAY/9.0/x86_64/include]
+  collapse include dir [/opt/cray/pe/dsmml/0.2.2/dsmml//include] ==> [/opt/cray/pe/dsmml/0.2.2/dsmml/include]
+  collapse include dir [/opt/cray/xpmem/2.3.2-2.2_9.4__g93dd7ee.shasta/include] ==> [/opt/cray/xpmem/2.3.2-2.2_9.4__g93dd7ee.shasta/include]
+  collapse include dir [/opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/clang/14.0.1/include] ==> [/opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/clang/14.0.1/include]
+  collapse include dir [/opt/cray/pe/cce/14.0.1/cce/x86_64/include/craylibs] ==> [/opt/cray/pe/cce/14.0.1/cce/x86_64/include/craylibs]
+  collapse include dir [/opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0/../../../../include/g++] ==> [/opt/cray/pe/gcc/10.3.0/snos/include/g++]
+  collapse include dir [/opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0/../../../../include/g++/x86_64-suse-linux] ==> [/opt/cray/pe/gcc/10.3.0/snos/include/g++/x86_64-suse-linux]
+  collapse include dir [/opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0/../../../../include/g++/backward] ==> [/opt/cray/pe/gcc/10.3.0/snos/include/g++/backward]
+  collapse include dir [/usr/local/include] ==> [/usr/local/include]
+  collapse include dir [/usr/include] ==> [/usr/include]
+  implicit include dirs: [/opt/cray/pe/mpich/8.1.17/ofi/cray/10.0/include;/opt/cray/pe/libsci/21.08.1.2/CRAY/9.0/x86_64/include;/opt/cray/pe/dsmml/0.2.2/dsmml/include;/opt/cray/xpmem/2.3.2-2.2_9.4__g93dd7ee.shasta/include;/opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/clang/14.0.1/include;/opt/cray/pe/cce/14.0.1/cce/x86_64/include/craylibs;/opt/cray/pe/gcc/10.3.0/snos/include/g++;/opt/cray/pe/gcc/10.3.0/snos/include/g++/x86_64-suse-linux;/opt/cray/pe/gcc/10.3.0/snos/include/g++/backward;/usr/local/include;/usr/include]
+
+
+Parsed CXX implicit link information from above output:
+  link line regex: [^( *|.*[/\])(ld|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\]+-)?ld|collect2)[^/\]*( |$)]
+  ignore line: [Change Dir: /cfs/klemming/home/e/edwardgl/project/build/CMakeFiles/CMakeTmp]
+  ignore line: []
+  ignore line: [Run Build Command(s):/usr/bin/gmake cmTC_10a77/fast && /usr/bin/gmake -f CMakeFiles/cmTC_10a77.dir/build.make CMakeFiles/cmTC_10a77.dir/build]
+  ignore line: [gmake[1]: Entering directory '/cfs/klemming/home/e/edwardgl/project/build/CMakeFiles/CMakeTmp']
+  ignore line: [Building CXX object CMakeFiles/cmTC_10a77.dir/CMakeCXXCompilerABI.cpp.o]
+  ignore line: [/opt/cray/pe/craype/2.7.16/bin/CC    -v -o CMakeFiles/cmTC_10a77.dir/CMakeCXXCompilerABI.cpp.o -c /usr/share/cmake/Modules/CMakeCXXCompilerABI.cpp]
+  ignore line: [Cray clang version 14.0.1  (3a8780657c742829e80f36338fb6ec6578642bb7)]
+  ignore line: [Target: x86_64-unknown-linux-gnu]
+  ignore line: [Thread model: posix]
+  ignore line: [InstalledDir: /opt/cray/pe/cce/14.0.1/cce-clang/x86_64/share/../bin]
+  ignore line: [Found candidate GCC installation: /opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0]
+  ignore line: [Selected GCC installation: /opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0]
+  ignore line: [Candidate multilib: .]
+  ignore line: [@m64]
+  ignore line: [Selected multilib: .]
+  ignore line: [@m64]
+  ignore line: [Found HIP installation: /opt/rocm-5.3.3  version 5.3.22062]
+  ignore line: [ (in-process)]
+  ignore line: [ "/opt/cray/pe/cce/14.0.1/cce-clang/x86_64/bin/clang-14" -cc1 -triple x86_64-unknown-linux-gnu -mllvm -cray-omp-opt-fork-call -mllvm -cray-omp-parallel-opt-call -mllvm -cray-openmp-rename-outlined -fcray-gpu -flocal-restrict -mllvm -cray-enhanced-asm=1 -fenhanced-asm=1 -mllvm -cray-enhanced-ir=1 -fenhanced-ir=1 -fomp-local-offload-table -ffortran -emit-obj -mrelax-all --mrelax-relocations -disable-free -clear-ast-before-backend -main-file-name CMakeCXXCompilerABI.cpp -mrelocation-model static -mframe-pointer=all -fmath-errno -ffp-contract=on -fno-rounding-math -mconstructor-aliases -funwind-tables=2 -target-cpu znver2 -mllvm -treat-scalable-fixed-error-as-warning -debugger-tuning=gdb -v -fcoverage-compilation-dir=/cfs/klemming/home/e/edwardgl/project/build/CMakeFiles/CMakeTmp -resource-dir /opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/clang/14.0.1 -isystem /opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/clang/14.0.1/include -isystem /opt/cray/pe/cce/14.0.1/cce/x86_64/include/craylibs -D __CRAY_X86_ROME -D __CRAYXT_COMPUTE_LINUX_TARGET -I /opt/cray/pe/mpich/8.1.17/ofi/cray/10.0/include -I /opt/cray/pe/libsci/21.08.1.2/CRAY/9.0/x86_64/include -I /opt/cray/pe/dsmml/0.2.2/dsmml//include -I /opt/cray/xpmem/2.3.2-2.2_9.4__g93dd7ee.shasta/include -internal-isystem /opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0/../../../../include/g++ -internal-isystem /opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0/../../../../include/g++/x86_64-suse-linux -internal-isystem /opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0/../../../../include/g++/backward -internal-isystem /opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/clang/14.0.1/include -internal-isystem /usr/local/include -internal-isystem /opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0/../../../../x86_64-suse-linux/include -internal-externc-isystem /include -internal-externc-isystem /usr/include -fdeprecated-macro -fdebug-compilation-dir=/cfs/klemming/home/e/edwardgl/project/build/CMakeFiles/CMakeTmp -ferror-limit 19 -fgnuc-version=4.2.1 -fcxx-exceptions -fexceptions -faddrsig -D__GCC_HAVE_DWARF2_CFI_ASM=1 -o CMakeFiles/cmTC_10a77.dir/CMakeCXXCompilerABI.cpp.o -x c++ /usr/share/cmake/Modules/CMakeCXXCompilerABI.cpp]
+  ignore line: [clang -cc1 version 14.0.1 based upon LLVM 14.0.1 default target x86_64-unknown-linux-gnu]
+  ignore line: [ignoring nonexistent directory "/opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0/../../../../x86_64-suse-linux/include"]
+  ignore line: [ignoring nonexistent directory "/include"]
+  ignore line: [ignoring duplicate directory "/opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/clang/14.0.1/include"]
+  ignore line: [#include "..." search starts here:]
+  ignore line: [#include <...> search starts here:]
+  ignore line: [ /opt/cray/pe/mpich/8.1.17/ofi/cray/10.0/include]
+  ignore line: [ /opt/cray/pe/libsci/21.08.1.2/CRAY/9.0/x86_64/include]
+  ignore line: [ /opt/cray/pe/dsmml/0.2.2/dsmml//include]
+  ignore line: [ /opt/cray/xpmem/2.3.2-2.2_9.4__g93dd7ee.shasta/include]
+  ignore line: [ /opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/clang/14.0.1/include]
+  ignore line: [ /opt/cray/pe/cce/14.0.1/cce/x86_64/include/craylibs]
+  ignore line: [ /opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0/../../../../include/g++]
+  ignore line: [ /opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0/../../../../include/g++/x86_64-suse-linux]
+  ignore line: [ /opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0/../../../../include/g++/backward]
+  ignore line: [ /usr/local/include]
+  ignore line: [ /usr/include]
+  ignore line: [End of search list.]
+  ignore line: [Linking CXX executable cmTC_10a77]
+  ignore line: [/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_10a77.dir/link.txt --verbose=1]
+  ignore line: [/opt/cray/pe/craype/2.7.16/bin/CC      -v CMakeFiles/cmTC_10a77.dir/CMakeCXXCompilerABI.cpp.o  -o cmTC_10a77 ]
+  ignore line: [Cray clang version 14.0.1  (3a8780657c742829e80f36338fb6ec6578642bb7)]
+  ignore line: [Target: x86_64-unknown-linux-gnu]
+  ignore line: [Thread model: posix]
+  ignore line: [InstalledDir: /opt/cray/pe/cce/14.0.1/cce-clang/x86_64/share/../bin]
+  ignore line: [Found candidate GCC installation: /opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0]
+  ignore line: [Selected GCC installation: /opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0]
+  ignore line: [Candidate multilib: .]
+  ignore line: [@m64]
+  ignore line: [Selected multilib: .]
+  ignore line: [@m64]
+  ignore line: [Found HIP installation: /opt/rocm-5.3.3  version 5.3.22062]
+  link line: [ "/opt/cray/pe/cce/14.0.1/cce-clang/x86_64/share/../bin/ld.lld" --eh-frame-hdr -m elf_x86_64 -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTC_10a77 /usr/lib/../lib64/crt1.o /usr/lib/../lib64/crti.o /opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/clang/14.0.1/lib/linux/clang_rt.crtbegin-x86_64.o -L/opt/cray/pe/mpich/8.1.17/ofi/cray/10.0/lib -L/opt/cray/pe/libsci/21.08.1.2/CRAY/9.0/x86_64/lib -L/opt/cray/pe/dsmml/0.2.2/dsmml//lib -L/opt/cray/pe/cce/14.0.1/cce/x86_64/lib/pkgconfig/../ -L/opt/gcc/10.3.0/snos/lib64 -L/opt/cray/pe/gcc/10.3.0/snos/lib64 -L/opt/cray/pe/cce/14.0.1/cce/x86_64/lib/pkgconfig/../ -L/opt/cray/xpmem/2.3.2-2.2_9.4__g93dd7ee.shasta/lib64 -L/opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0 -L/opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0/../../../../lib64 -L/lib/../lib64 -L/usr/lib/../lib64 -L/opt/cray/pe/cce/14.0.1/cce-clang/x86_64/bin/../lib -L/lib -L/usr/lib -plugin-opt=mcpu=znver2 -plugin-opt=lto=0 -plugin-opt=defaults=cray -plugin-opt=mllvm=-cray-math-precision=none -rpath=/opt/cray/pe/cce/14.0.1/cce/x86_64/lib -rpath=/opt/cray/pe/gcc-libs CMakeFiles/cmTC_10a77.dir/CMakeCXXCompilerABI.cpp.o --as-needed -lmpi_cray --no-as-needed --as-needed -lsci_cray_mpi --no-as-needed --as-needed -lsci_cray --no-as-needed -ldl --as-needed -ldsmml --no-as-needed -lxpmem --as-needed -lstdc++ --no-as-needed --as-needed -lpgas-shmem --no-as-needed -lquadmath -lmodules -lfi -lcraymath -lf -lu -lcsup --as-needed -lpthread -latomic --no-as-needed --as-needed -lm --no-as-needed --disable-new-dtags /opt/cray/pe/cce/14.0.1/cce/x86_64/lib/no_mmap.o -lstdc++ -lm /opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/clang/14.0.1/lib/linux/libclang_rt.builtins-x86_64.a -rpath=/opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib /opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/libunwind.so -l:libunwind.so -lc /opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/clang/14.0.1/lib/linux/libclang_rt.builtins-x86_64.a -rpath=/opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib /opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/libunwind.so -l:libunwind.so /opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/clang/14.0.1/lib/linux/clang_rt.crtend-x86_64.o /usr/lib/../lib64/crtn.o]
+    arg [/opt/cray/pe/cce/14.0.1/cce-clang/x86_64/share/../bin/ld.lld] ==> ignore
+    arg [--eh-frame-hdr] ==> ignore
+    arg [-m] ==> ignore
+    arg [elf_x86_64] ==> ignore
+    arg [-dynamic-linker] ==> ignore
+    arg [/lib64/ld-linux-x86-64.so.2] ==> ignore
+    arg [-o] ==> ignore
+    arg [cmTC_10a77] ==> ignore
+    arg [/usr/lib/../lib64/crt1.o] ==> ignore
+    arg [/usr/lib/../lib64/crti.o] ==> ignore
+    arg [/opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/clang/14.0.1/lib/linux/clang_rt.crtbegin-x86_64.o] ==> ignore
+    arg [-L/opt/cray/pe/mpich/8.1.17/ofi/cray/10.0/lib] ==> dir [/opt/cray/pe/mpich/8.1.17/ofi/cray/10.0/lib]
+    arg [-L/opt/cray/pe/libsci/21.08.1.2/CRAY/9.0/x86_64/lib] ==> dir [/opt/cray/pe/libsci/21.08.1.2/CRAY/9.0/x86_64/lib]
+    arg [-L/opt/cray/pe/dsmml/0.2.2/dsmml//lib] ==> dir [/opt/cray/pe/dsmml/0.2.2/dsmml//lib]
+    arg [-L/opt/cray/pe/cce/14.0.1/cce/x86_64/lib/pkgconfig/../] ==> dir [/opt/cray/pe/cce/14.0.1/cce/x86_64/lib/pkgconfig/../]
+    arg [-L/opt/gcc/10.3.0/snos/lib64] ==> dir [/opt/gcc/10.3.0/snos/lib64]
+    arg [-L/opt/cray/pe/gcc/10.3.0/snos/lib64] ==> dir [/opt/cray/pe/gcc/10.3.0/snos/lib64]
+    arg [-L/opt/cray/pe/cce/14.0.1/cce/x86_64/lib/pkgconfig/../] ==> dir [/opt/cray/pe/cce/14.0.1/cce/x86_64/lib/pkgconfig/../]
+    arg [-L/opt/cray/xpmem/2.3.2-2.2_9.4__g93dd7ee.shasta/lib64] ==> dir [/opt/cray/xpmem/2.3.2-2.2_9.4__g93dd7ee.shasta/lib64]
+    arg [-L/opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0] ==> dir [/opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0]
+    arg [-L/opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0/../../../../lib64] ==> dir [/opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0/../../../../lib64]
+    arg [-L/lib/../lib64] ==> dir [/lib/../lib64]
+    arg [-L/usr/lib/../lib64] ==> dir [/usr/lib/../lib64]
+    arg [-L/opt/cray/pe/cce/14.0.1/cce-clang/x86_64/bin/../lib] ==> dir [/opt/cray/pe/cce/14.0.1/cce-clang/x86_64/bin/../lib]
+    arg [-L/lib] ==> dir [/lib]
+    arg [-L/usr/lib] ==> dir [/usr/lib]
+    arg [-plugin-opt=mcpu=znver2] ==> ignore
+    arg [-plugin-opt=lto=0] ==> ignore
+    arg [-plugin-opt=defaults=cray] ==> ignore
+    arg [-plugin-opt=mllvm=-cray-math-precision=none] ==> ignore
+    arg [-rpath=/opt/cray/pe/cce/14.0.1/cce/x86_64/lib] ==> ignore
+    arg [-rpath=/opt/cray/pe/gcc-libs] ==> ignore
+    arg [CMakeFiles/cmTC_10a77.dir/CMakeCXXCompilerABI.cpp.o] ==> ignore
+    arg [--as-needed] ==> ignore
+    arg [-lmpi_cray] ==> lib [mpi_cray]
+    arg [--no-as-needed] ==> ignore
+    arg [--as-needed] ==> ignore
+    arg [-lsci_cray_mpi] ==> lib [sci_cray_mpi]
+    arg [--no-as-needed] ==> ignore
+    arg [--as-needed] ==> ignore
+    arg [-lsci_cray] ==> lib [sci_cray]
+    arg [--no-as-needed] ==> ignore
+    arg [-ldl] ==> lib [dl]
+    arg [--as-needed] ==> ignore
+    arg [-ldsmml] ==> lib [dsmml]
+    arg [--no-as-needed] ==> ignore
+    arg [-lxpmem] ==> lib [xpmem]
+    arg [--as-needed] ==> ignore
+    arg [-lstdc++] ==> lib [stdc++]
+    arg [--no-as-needed] ==> ignore
+    arg [--as-needed] ==> ignore
+    arg [-lpgas-shmem] ==> lib [pgas-shmem]
+    arg [--no-as-needed] ==> ignore
+    arg [-lquadmath] ==> lib [quadmath]
+    arg [-lmodules] ==> lib [modules]
+    arg [-lfi] ==> lib [fi]
+    arg [-lcraymath] ==> lib [craymath]
+    arg [-lf] ==> lib [f]
+    arg [-lu] ==> lib [u]
+    arg [-lcsup] ==> lib [csup]
+    arg [--as-needed] ==> ignore
+    arg [-lpthread] ==> lib [pthread]
+    arg [-latomic] ==> lib [atomic]
+    arg [--no-as-needed] ==> ignore
+    arg [--as-needed] ==> ignore
+    arg [-lm] ==> lib [m]
+    arg [--no-as-needed] ==> ignore
+    arg [--disable-new-dtags] ==> ignore
+    arg [/opt/cray/pe/cce/14.0.1/cce/x86_64/lib/no_mmap.o] ==> ignore
+    arg [-lstdc++] ==> lib [stdc++]
+    arg [-lm] ==> lib [m]
+    arg [/opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/clang/14.0.1/lib/linux/libclang_rt.builtins-x86_64.a] ==> lib [/opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/clang/14.0.1/lib/linux/libclang_rt.builtins-x86_64.a]
+    arg [-rpath=/opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib] ==> ignore
+    arg [/opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/libunwind.so] ==> ignore
+    arg [-l:libunwind.so] ==> lib [-l:libunwind.so]
+    arg [-lc] ==> lib [c]
+    arg [/opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/clang/14.0.1/lib/linux/libclang_rt.builtins-x86_64.a] ==> lib [/opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/clang/14.0.1/lib/linux/libclang_rt.builtins-x86_64.a]
+    arg [-rpath=/opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib] ==> ignore
+    arg [/opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/libunwind.so] ==> ignore
+    arg [-l:libunwind.so] ==> lib [-l:libunwind.so]
+    arg [/opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/clang/14.0.1/lib/linux/clang_rt.crtend-x86_64.o] ==> ignore
+    arg [/usr/lib/../lib64/crtn.o] ==> ignore
+  remove lib [/opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/clang/14.0.1/lib/linux/libclang_rt.builtins-x86_64.a]
+  remove lib [/opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/clang/14.0.1/lib/linux/libclang_rt.builtins-x86_64.a]
+  collapse library dir [/opt/cray/pe/mpich/8.1.17/ofi/cray/10.0/lib] ==> [/opt/cray/pe/mpich/8.1.17/ofi/cray/10.0/lib]
+  collapse library dir [/opt/cray/pe/libsci/21.08.1.2/CRAY/9.0/x86_64/lib] ==> [/opt/cray/pe/libsci/21.08.1.2/CRAY/9.0/x86_64/lib]
+  collapse library dir [/opt/cray/pe/dsmml/0.2.2/dsmml//lib] ==> [/opt/cray/pe/dsmml/0.2.2/dsmml/lib]
+  collapse library dir [/opt/cray/pe/cce/14.0.1/cce/x86_64/lib/pkgconfig/../] ==> [/opt/cray/pe/cce/14.0.1/cce/x86_64/lib]
+  collapse library dir [/opt/gcc/10.3.0/snos/lib64] ==> [/opt/gcc/10.3.0/snos/lib64]
+  collapse library dir [/opt/cray/pe/gcc/10.3.0/snos/lib64] ==> [/opt/cray/pe/gcc/10.3.0/snos/lib64]
+  collapse library dir [/opt/cray/pe/cce/14.0.1/cce/x86_64/lib/pkgconfig/../] ==> [/opt/cray/pe/cce/14.0.1/cce/x86_64/lib]
+  collapse library dir [/opt/cray/xpmem/2.3.2-2.2_9.4__g93dd7ee.shasta/lib64] ==> [/opt/cray/xpmem/2.3.2-2.2_9.4__g93dd7ee.shasta/lib64]
+  collapse library dir [/opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0] ==> [/opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0]
+  collapse library dir [/opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0/../../../../lib64] ==> [/opt/cray/pe/gcc/10.3.0/snos/lib64]
+  collapse library dir [/lib/../lib64] ==> [/lib64]
+  collapse library dir [/usr/lib/../lib64] ==> [/usr/lib64]
+  collapse library dir [/opt/cray/pe/cce/14.0.1/cce-clang/x86_64/bin/../lib] ==> [/opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib]
+  collapse library dir [/lib] ==> [/lib]
+  collapse library dir [/usr/lib] ==> [/usr/lib]
+  implicit libs: [mpi_cray;sci_cray_mpi;sci_cray;dl;dsmml;xpmem;stdc++;pgas-shmem;quadmath;modules;fi;craymath;f;u;csup;pthread;atomic;m;stdc++;m;-l:libunwind.so;c;-l:libunwind.so]
+  implicit dirs: [/opt/cray/pe/mpich/8.1.17/ofi/cray/10.0/lib;/opt/cray/pe/libsci/21.08.1.2/CRAY/9.0/x86_64/lib;/opt/cray/pe/dsmml/0.2.2/dsmml/lib;/opt/cray/pe/cce/14.0.1/cce/x86_64/lib;/opt/gcc/10.3.0/snos/lib64;/opt/cray/pe/gcc/10.3.0/snos/lib64;/opt/cray/xpmem/2.3.2-2.2_9.4__g93dd7ee.shasta/lib64;/opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0;/lib64;/usr/lib64;/opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib;/lib;/usr/lib]
+  implicit fwks: []
+
+
+Detecting CXX OpenMP compiler ABI info compiled with the following output:
+Change Dir: /cfs/klemming/home/e/edwardgl/project/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake cmTC_20619/fast && /usr/bin/gmake -f CMakeFiles/cmTC_20619.dir/build.make CMakeFiles/cmTC_20619.dir/build
+gmake[1]: Entering directory '/cfs/klemming/home/e/edwardgl/project/build/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_20619.dir/OpenMPTryFlag.cpp.o
+/opt/cray/pe/craype/2.7.16/bin/CC    -fopenmp -v   -std=c++17 -o CMakeFiles/cmTC_20619.dir/OpenMPTryFlag.cpp.o -c /cfs/klemming/home/e/edwardgl/project/build/CMakeFiles/FindOpenMP/OpenMPTryFlag.cpp
+Cray clang version 14.0.1  (3a8780657c742829e80f36338fb6ec6578642bb7)
+Target: x86_64-unknown-linux-gnu
+Thread model: posix
+InstalledDir: /opt/cray/pe/cce/14.0.1/cce-clang/x86_64/share/../bin
+Found candidate GCC installation: /opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0
+Selected GCC installation: /opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0
+Candidate multilib: .;@m64
+Selected multilib: .;@m64
+Found HIP installation: /opt/rocm-5.3.3, version 5.3.22062
+ (in-process)
+ "/opt/cray/pe/cce/14.0.1/cce-clang/x86_64/bin/clang-14" -cc1 -triple x86_64-unknown-linux-gnu -mllvm -cray-omp-opt-fork-call -mllvm -cray-omp-parallel-opt-call -mllvm -cray-openmp-rename-outlined -fcray-gpu -flocal-restrict -mllvm -cray-enhanced-asm=1 -fenhanced-asm=1 -mllvm -cray-enhanced-ir=1 -fenhanced-ir=1 -fomp-local-offload-table -ffortran -emit-obj -mrelax-all --mrelax-relocations -disable-free -clear-ast-before-backend -main-file-name OpenMPTryFlag.cpp -mrelocation-model static -mframe-pointer=all -fmath-errno -ffp-contract=on -fno-rounding-math -mconstructor-aliases -funwind-tables=2 -target-cpu znver2 -mllvm -treat-scalable-fixed-error-as-warning -debugger-tuning=gdb -v -fcoverage-compilation-dir=/cfs/klemming/home/e/edwardgl/project/build/CMakeFiles/CMakeTmp -resource-dir /opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/clang/14.0.1 -isystem /opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/clang/14.0.1/include -isystem /opt/cray/pe/cce/14.0.1/cce/x86_64/include/craylibs -D __CRAY_X86_ROME -D __CRAYXT_COMPUTE_LINUX_TARGET -I /opt/cray/pe/mpich/8.1.17/ofi/cray/10.0/include -I /opt/cray/pe/libsci/21.08.1.2/CRAY/9.0/x86_64/include -I /opt/cray/pe/dsmml/0.2.2/dsmml//include -I /opt/cray/xpmem/2.3.2-2.2_9.4__g93dd7ee.shasta/include -internal-isystem /opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0/../../../../include/g++ -internal-isystem /opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0/../../../../include/g++/x86_64-suse-linux -internal-isystem /opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0/../../../../include/g++/backward -internal-isystem /opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/clang/14.0.1/include -internal-isystem /usr/local/include -internal-isystem /opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0/../../../../x86_64-suse-linux/include -internal-externc-isystem /include -internal-externc-isystem /usr/include -std=c++17 -fdeprecated-macro -fdebug-compilation-dir=/cfs/klemming/home/e/edwardgl/project/build/CMakeFiles/CMakeTmp -ferror-limit 19 -fcray-openmp -fcray-omp-opt-fork -fcray-omp-parallel-opt -fcray-openmp-rename-outlined-funcs -fopenmp -fopenmp-target-new-runtime -fgnuc-version=4.2.1 -fcxx-exceptions -fexceptions -faddrsig -D__GCC_HAVE_DWARF2_CFI_ASM=1 -o CMakeFiles/cmTC_20619.dir/OpenMPTryFlag.cpp.o -x c++ /cfs/klemming/home/e/edwardgl/project/build/CMakeFiles/FindOpenMP/OpenMPTryFlag.cpp
+clang -cc1 version 14.0.1 based upon LLVM 14.0.1 default target x86_64-unknown-linux-gnu
+ignoring nonexistent directory "/opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0/../../../../x86_64-suse-linux/include"
+ignoring nonexistent directory "/include"
+ignoring duplicate directory "/opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/clang/14.0.1/include"
+#include "..." search starts here:
+#include <...> search starts here:
+ /opt/cray/pe/mpich/8.1.17/ofi/cray/10.0/include
+ /opt/cray/pe/libsci/21.08.1.2/CRAY/9.0/x86_64/include
+ /opt/cray/pe/dsmml/0.2.2/dsmml//include
+ /opt/cray/xpmem/2.3.2-2.2_9.4__g93dd7ee.shasta/include
+ /opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/clang/14.0.1/include
+ /opt/cray/pe/cce/14.0.1/cce/x86_64/include/craylibs
+ /opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0/../../../../include/g++
+ /opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0/../../../../include/g++/x86_64-suse-linux
+ /opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0/../../../../include/g++/backward
+ /usr/local/include
+ /usr/include
+End of search list.
+Linking CXX executable cmTC_20619
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_20619.dir/link.txt --verbose=1
+/opt/cray/pe/craype/2.7.16/bin/CC   -fopenmp -v    CMakeFiles/cmTC_20619.dir/OpenMPTryFlag.cpp.o  -o cmTC_20619  -v 
+Cray clang version 14.0.1  (3a8780657c742829e80f36338fb6ec6578642bb7)
+Target: x86_64-unknown-linux-gnu
+Thread model: posix
+InstalledDir: /opt/cray/pe/cce/14.0.1/cce-clang/x86_64/share/../bin
+Found candidate GCC installation: /opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0
+Selected GCC installation: /opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0
+Candidate multilib: .;@m64
+Selected multilib: .;@m64
+Found HIP installation: /opt/rocm-5.3.3, version 5.3.22062
+ "/opt/cray/pe/cce/14.0.1/cce-clang/x86_64/share/../bin/ld.lld" --eh-frame-hdr -m elf_x86_64 -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTC_20619 /usr/lib/../lib64/crt1.o /usr/lib/../lib64/crti.o /opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/clang/14.0.1/lib/linux/clang_rt.crtbegin-x86_64.o -L/opt/cray/pe/mpich/8.1.17/ofi/cray/10.0/lib -L/opt/cray/pe/libsci/21.08.1.2/CRAY/9.0/x86_64/lib -L/opt/cray/pe/dsmml/0.2.2/dsmml//lib -L/opt/cray/pe/cce/14.0.1/cce/x86_64/lib/pkgconfig/../ -L/opt/gcc/10.3.0/snos/lib64 -L/opt/cray/pe/gcc/10.3.0/snos/lib64 -L/opt/cray/pe/cce/14.0.1/cce/x86_64/lib/pkgconfig/../ -L/opt/cray/xpmem/2.3.2-2.2_9.4__g93dd7ee.shasta/lib64 -L/opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0 -L/opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0/../../../../lib64 -L/lib/../lib64 -L/usr/lib/../lib64 -L/opt/cray/pe/cce/14.0.1/cce-clang/x86_64/bin/../lib -L/lib -L/usr/lib -plugin-opt=mcpu=znver2 -plugin-opt=lto=0 -plugin-opt=defaults=cray -plugin-opt=mllvm=-cray-math-precision=none -rpath=/opt/cray/pe/cce/14.0.1/cce/x86_64/lib -rpath=/opt/cray/pe/gcc-libs CMakeFiles/cmTC_20619.dir/OpenMPTryFlag.cpp.o --as-needed -lmpi_cray --no-as-needed --as-needed -lsci_cray_mpi_mp --no-as-needed --as-needed -lsci_cray_mp --no-as-needed -ldl --as-needed -ldsmml --no-as-needed -lxpmem --as-needed -lstdc++ --no-as-needed --as-needed -lpgas-shmem --no-as-needed -lquadmath -lmodules -lfi -lcraymath -lf -lu -lcsup --as-needed -lpthread -latomic --no-as-needed --as-needed -lm --no-as-needed --disable-new-dtags /opt/cray/pe/cce/14.0.1/cce/x86_64/lib/no_mmap.o -lstdc++ -lm -lcraymp /opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/clang/14.0.1/lib/linux/libclang_rt.builtins-x86_64.a -rpath=/opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib /opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/libunwind.so -l:libunwind.so -lpthread -lc /opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/clang/14.0.1/lib/linux/libclang_rt.builtins-x86_64.a -rpath=/opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib /opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/libunwind.so -l:libunwind.so /opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/clang/14.0.1/lib/linux/clang_rt.crtend-x86_64.o /usr/lib/../lib64/crtn.o
+gmake[1]: Leaving directory '/cfs/klemming/home/e/edwardgl/project/build/CMakeFiles/CMakeTmp'
+
+
+
+Parsed CXX OpenMP implicit link information from above output:
+  link line regex: [^( *|.*[/\])(ld|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\]+-)?ld|collect2)[^/\]*( |$)]
+  ignore line: [Change Dir: /cfs/klemming/home/e/edwardgl/project/build/CMakeFiles/CMakeTmp]
+  ignore line: []
+  ignore line: [Run Build Command(s):/usr/bin/gmake cmTC_20619/fast && /usr/bin/gmake -f CMakeFiles/cmTC_20619.dir/build.make CMakeFiles/cmTC_20619.dir/build]
+  ignore line: [gmake[1]: Entering directory '/cfs/klemming/home/e/edwardgl/project/build/CMakeFiles/CMakeTmp']
+  ignore line: [Building CXX object CMakeFiles/cmTC_20619.dir/OpenMPTryFlag.cpp.o]
+  ignore line: [/opt/cray/pe/craype/2.7.16/bin/CC    -fopenmp -v   -std=c++17 -o CMakeFiles/cmTC_20619.dir/OpenMPTryFlag.cpp.o -c /cfs/klemming/home/e/edwardgl/project/build/CMakeFiles/FindOpenMP/OpenMPTryFlag.cpp]
+  ignore line: [Cray clang version 14.0.1  (3a8780657c742829e80f36338fb6ec6578642bb7)]
+  ignore line: [Target: x86_64-unknown-linux-gnu]
+  ignore line: [Thread model: posix]
+  ignore line: [InstalledDir: /opt/cray/pe/cce/14.0.1/cce-clang/x86_64/share/../bin]
+  ignore line: [Found candidate GCC installation: /opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0]
+  ignore line: [Selected GCC installation: /opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0]
+  ignore line: [Candidate multilib: .]
+  ignore line: [@m64]
+  ignore line: [Selected multilib: .]
+  ignore line: [@m64]
+  ignore line: [Found HIP installation: /opt/rocm-5.3.3  version 5.3.22062]
+  ignore line: [ (in-process)]
+  ignore line: [ "/opt/cray/pe/cce/14.0.1/cce-clang/x86_64/bin/clang-14" -cc1 -triple x86_64-unknown-linux-gnu -mllvm -cray-omp-opt-fork-call -mllvm -cray-omp-parallel-opt-call -mllvm -cray-openmp-rename-outlined -fcray-gpu -flocal-restrict -mllvm -cray-enhanced-asm=1 -fenhanced-asm=1 -mllvm -cray-enhanced-ir=1 -fenhanced-ir=1 -fomp-local-offload-table -ffortran -emit-obj -mrelax-all --mrelax-relocations -disable-free -clear-ast-before-backend -main-file-name OpenMPTryFlag.cpp -mrelocation-model static -mframe-pointer=all -fmath-errno -ffp-contract=on -fno-rounding-math -mconstructor-aliases -funwind-tables=2 -target-cpu znver2 -mllvm -treat-scalable-fixed-error-as-warning -debugger-tuning=gdb -v -fcoverage-compilation-dir=/cfs/klemming/home/e/edwardgl/project/build/CMakeFiles/CMakeTmp -resource-dir /opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/clang/14.0.1 -isystem /opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/clang/14.0.1/include -isystem /opt/cray/pe/cce/14.0.1/cce/x86_64/include/craylibs -D __CRAY_X86_ROME -D __CRAYXT_COMPUTE_LINUX_TARGET -I /opt/cray/pe/mpich/8.1.17/ofi/cray/10.0/include -I /opt/cray/pe/libsci/21.08.1.2/CRAY/9.0/x86_64/include -I /opt/cray/pe/dsmml/0.2.2/dsmml//include -I /opt/cray/xpmem/2.3.2-2.2_9.4__g93dd7ee.shasta/include -internal-isystem /opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0/../../../../include/g++ -internal-isystem /opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0/../../../../include/g++/x86_64-suse-linux -internal-isystem /opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0/../../../../include/g++/backward -internal-isystem /opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/clang/14.0.1/include -internal-isystem /usr/local/include -internal-isystem /opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0/../../../../x86_64-suse-linux/include -internal-externc-isystem /include -internal-externc-isystem /usr/include -std=c++17 -fdeprecated-macro -fdebug-compilation-dir=/cfs/klemming/home/e/edwardgl/project/build/CMakeFiles/CMakeTmp -ferror-limit 19 -fcray-openmp -fcray-omp-opt-fork -fcray-omp-parallel-opt -fcray-openmp-rename-outlined-funcs -fopenmp -fopenmp-target-new-runtime -fgnuc-version=4.2.1 -fcxx-exceptions -fexceptions -faddrsig -D__GCC_HAVE_DWARF2_CFI_ASM=1 -o CMakeFiles/cmTC_20619.dir/OpenMPTryFlag.cpp.o -x c++ /cfs/klemming/home/e/edwardgl/project/build/CMakeFiles/FindOpenMP/OpenMPTryFlag.cpp]
+  ignore line: [clang -cc1 version 14.0.1 based upon LLVM 14.0.1 default target x86_64-unknown-linux-gnu]
+  ignore line: [ignoring nonexistent directory "/opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0/../../../../x86_64-suse-linux/include"]
+  ignore line: [ignoring nonexistent directory "/include"]
+  ignore line: [ignoring duplicate directory "/opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/clang/14.0.1/include"]
+  ignore line: [#include "..." search starts here:]
+  ignore line: [#include <...> search starts here:]
+  ignore line: [ /opt/cray/pe/mpich/8.1.17/ofi/cray/10.0/include]
+  ignore line: [ /opt/cray/pe/libsci/21.08.1.2/CRAY/9.0/x86_64/include]
+  ignore line: [ /opt/cray/pe/dsmml/0.2.2/dsmml//include]
+  ignore line: [ /opt/cray/xpmem/2.3.2-2.2_9.4__g93dd7ee.shasta/include]
+  ignore line: [ /opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/clang/14.0.1/include]
+  ignore line: [ /opt/cray/pe/cce/14.0.1/cce/x86_64/include/craylibs]
+  ignore line: [ /opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0/../../../../include/g++]
+  ignore line: [ /opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0/../../../../include/g++/x86_64-suse-linux]
+  ignore line: [ /opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0/../../../../include/g++/backward]
+  ignore line: [ /usr/local/include]
+  ignore line: [ /usr/include]
+  ignore line: [End of search list.]
+  ignore line: [Linking CXX executable cmTC_20619]
+  ignore line: [/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_20619.dir/link.txt --verbose=1]
+  ignore line: [/opt/cray/pe/craype/2.7.16/bin/CC   -fopenmp -v    CMakeFiles/cmTC_20619.dir/OpenMPTryFlag.cpp.o  -o cmTC_20619  -v ]
+  ignore line: [Cray clang version 14.0.1  (3a8780657c742829e80f36338fb6ec6578642bb7)]
+  ignore line: [Target: x86_64-unknown-linux-gnu]
+  ignore line: [Thread model: posix]
+  ignore line: [InstalledDir: /opt/cray/pe/cce/14.0.1/cce-clang/x86_64/share/../bin]
+  ignore line: [Found candidate GCC installation: /opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0]
+  ignore line: [Selected GCC installation: /opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0]
+  ignore line: [Candidate multilib: .]
+  ignore line: [@m64]
+  ignore line: [Selected multilib: .]
+  ignore line: [@m64]
+  ignore line: [Found HIP installation: /opt/rocm-5.3.3  version 5.3.22062]
+  link line: [ "/opt/cray/pe/cce/14.0.1/cce-clang/x86_64/share/../bin/ld.lld" --eh-frame-hdr -m elf_x86_64 -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTC_20619 /usr/lib/../lib64/crt1.o /usr/lib/../lib64/crti.o /opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/clang/14.0.1/lib/linux/clang_rt.crtbegin-x86_64.o -L/opt/cray/pe/mpich/8.1.17/ofi/cray/10.0/lib -L/opt/cray/pe/libsci/21.08.1.2/CRAY/9.0/x86_64/lib -L/opt/cray/pe/dsmml/0.2.2/dsmml//lib -L/opt/cray/pe/cce/14.0.1/cce/x86_64/lib/pkgconfig/../ -L/opt/gcc/10.3.0/snos/lib64 -L/opt/cray/pe/gcc/10.3.0/snos/lib64 -L/opt/cray/pe/cce/14.0.1/cce/x86_64/lib/pkgconfig/../ -L/opt/cray/xpmem/2.3.2-2.2_9.4__g93dd7ee.shasta/lib64 -L/opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0 -L/opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0/../../../../lib64 -L/lib/../lib64 -L/usr/lib/../lib64 -L/opt/cray/pe/cce/14.0.1/cce-clang/x86_64/bin/../lib -L/lib -L/usr/lib -plugin-opt=mcpu=znver2 -plugin-opt=lto=0 -plugin-opt=defaults=cray -plugin-opt=mllvm=-cray-math-precision=none -rpath=/opt/cray/pe/cce/14.0.1/cce/x86_64/lib -rpath=/opt/cray/pe/gcc-libs CMakeFiles/cmTC_20619.dir/OpenMPTryFlag.cpp.o --as-needed -lmpi_cray --no-as-needed --as-needed -lsci_cray_mpi_mp --no-as-needed --as-needed -lsci_cray_mp --no-as-needed -ldl --as-needed -ldsmml --no-as-needed -lxpmem --as-needed -lstdc++ --no-as-needed --as-needed -lpgas-shmem --no-as-needed -lquadmath -lmodules -lfi -lcraymath -lf -lu -lcsup --as-needed -lpthread -latomic --no-as-needed --as-needed -lm --no-as-needed --disable-new-dtags /opt/cray/pe/cce/14.0.1/cce/x86_64/lib/no_mmap.o -lstdc++ -lm -lcraymp /opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/clang/14.0.1/lib/linux/libclang_rt.builtins-x86_64.a -rpath=/opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib /opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/libunwind.so -l:libunwind.so -lpthread -lc /opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/clang/14.0.1/lib/linux/libclang_rt.builtins-x86_64.a -rpath=/opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib /opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/libunwind.so -l:libunwind.so /opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/clang/14.0.1/lib/linux/clang_rt.crtend-x86_64.o /usr/lib/../lib64/crtn.o]
+    arg [/opt/cray/pe/cce/14.0.1/cce-clang/x86_64/share/../bin/ld.lld] ==> ignore
+    arg [--eh-frame-hdr] ==> ignore
+    arg [-m] ==> ignore
+    arg [elf_x86_64] ==> ignore
+    arg [-dynamic-linker] ==> ignore
+    arg [/lib64/ld-linux-x86-64.so.2] ==> ignore
+    arg [-o] ==> ignore
+    arg [cmTC_20619] ==> ignore
+    arg [/usr/lib/../lib64/crt1.o] ==> ignore
+    arg [/usr/lib/../lib64/crti.o] ==> ignore
+    arg [/opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/clang/14.0.1/lib/linux/clang_rt.crtbegin-x86_64.o] ==> ignore
+    arg [-L/opt/cray/pe/mpich/8.1.17/ofi/cray/10.0/lib] ==> dir [/opt/cray/pe/mpich/8.1.17/ofi/cray/10.0/lib]
+    arg [-L/opt/cray/pe/libsci/21.08.1.2/CRAY/9.0/x86_64/lib] ==> dir [/opt/cray/pe/libsci/21.08.1.2/CRAY/9.0/x86_64/lib]
+    arg [-L/opt/cray/pe/dsmml/0.2.2/dsmml//lib] ==> dir [/opt/cray/pe/dsmml/0.2.2/dsmml//lib]
+    arg [-L/opt/cray/pe/cce/14.0.1/cce/x86_64/lib/pkgconfig/../] ==> dir [/opt/cray/pe/cce/14.0.1/cce/x86_64/lib/pkgconfig/../]
+    arg [-L/opt/gcc/10.3.0/snos/lib64] ==> dir [/opt/gcc/10.3.0/snos/lib64]
+    arg [-L/opt/cray/pe/gcc/10.3.0/snos/lib64] ==> dir [/opt/cray/pe/gcc/10.3.0/snos/lib64]
+    arg [-L/opt/cray/pe/cce/14.0.1/cce/x86_64/lib/pkgconfig/../] ==> dir [/opt/cray/pe/cce/14.0.1/cce/x86_64/lib/pkgconfig/../]
+    arg [-L/opt/cray/xpmem/2.3.2-2.2_9.4__g93dd7ee.shasta/lib64] ==> dir [/opt/cray/xpmem/2.3.2-2.2_9.4__g93dd7ee.shasta/lib64]
+    arg [-L/opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0] ==> dir [/opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0]
+    arg [-L/opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0/../../../../lib64] ==> dir [/opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0/../../../../lib64]
+    arg [-L/lib/../lib64] ==> dir [/lib/../lib64]
+    arg [-L/usr/lib/../lib64] ==> dir [/usr/lib/../lib64]
+    arg [-L/opt/cray/pe/cce/14.0.1/cce-clang/x86_64/bin/../lib] ==> dir [/opt/cray/pe/cce/14.0.1/cce-clang/x86_64/bin/../lib]
+    arg [-L/lib] ==> dir [/lib]
+    arg [-L/usr/lib] ==> dir [/usr/lib]
+    arg [-plugin-opt=mcpu=znver2] ==> ignore
+    arg [-plugin-opt=lto=0] ==> ignore
+    arg [-plugin-opt=defaults=cray] ==> ignore
+    arg [-plugin-opt=mllvm=-cray-math-precision=none] ==> ignore
+    arg [-rpath=/opt/cray/pe/cce/14.0.1/cce/x86_64/lib] ==> ignore
+    arg [-rpath=/opt/cray/pe/gcc-libs] ==> ignore
+    arg [CMakeFiles/cmTC_20619.dir/OpenMPTryFlag.cpp.o] ==> ignore
+    arg [--as-needed] ==> ignore
+    arg [-lmpi_cray] ==> lib [mpi_cray]
+    arg [--no-as-needed] ==> ignore
+    arg [--as-needed] ==> ignore
+    arg [-lsci_cray_mpi_mp] ==> lib [sci_cray_mpi_mp]
+    arg [--no-as-needed] ==> ignore
+    arg [--as-needed] ==> ignore
+    arg [-lsci_cray_mp] ==> lib [sci_cray_mp]
+    arg [--no-as-needed] ==> ignore
+    arg [-ldl] ==> lib [dl]
+    arg [--as-needed] ==> ignore
+    arg [-ldsmml] ==> lib [dsmml]
+    arg [--no-as-needed] ==> ignore
+    arg [-lxpmem] ==> lib [xpmem]
+    arg [--as-needed] ==> ignore
+    arg [-lstdc++] ==> lib [stdc++]
+    arg [--no-as-needed] ==> ignore
+    arg [--as-needed] ==> ignore
+    arg [-lpgas-shmem] ==> lib [pgas-shmem]
+    arg [--no-as-needed] ==> ignore
+    arg [-lquadmath] ==> lib [quadmath]
+    arg [-lmodules] ==> lib [modules]
+    arg [-lfi] ==> lib [fi]
+    arg [-lcraymath] ==> lib [craymath]
+    arg [-lf] ==> lib [f]
+    arg [-lu] ==> lib [u]
+    arg [-lcsup] ==> lib [csup]
+    arg [--as-needed] ==> ignore
+    arg [-lpthread] ==> lib [pthread]
+    arg [-latomic] ==> lib [atomic]
+    arg [--no-as-needed] ==> ignore
+    arg [--as-needed] ==> ignore
+    arg [-lm] ==> lib [m]
+    arg [--no-as-needed] ==> ignore
+    arg [--disable-new-dtags] ==> ignore
+    arg [/opt/cray/pe/cce/14.0.1/cce/x86_64/lib/no_mmap.o] ==> ignore
+    arg [-lstdc++] ==> lib [stdc++]
+    arg [-lm] ==> lib [m]
+    arg [-lcraymp] ==> lib [craymp]
+    arg [/opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/clang/14.0.1/lib/linux/libclang_rt.builtins-x86_64.a] ==> lib [/opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/clang/14.0.1/lib/linux/libclang_rt.builtins-x86_64.a]
+    arg [-rpath=/opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib] ==> ignore
+    arg [/opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/libunwind.so] ==> ignore
+    arg [-l:libunwind.so] ==> lib [-l:libunwind.so]
+    arg [-lpthread] ==> lib [pthread]
+    arg [-lc] ==> lib [c]
+    arg [/opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/clang/14.0.1/lib/linux/libclang_rt.builtins-x86_64.a] ==> lib [/opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/clang/14.0.1/lib/linux/libclang_rt.builtins-x86_64.a]
+    arg [-rpath=/opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib] ==> ignore
+    arg [/opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/libunwind.so] ==> ignore
+    arg [-l:libunwind.so] ==> lib [-l:libunwind.so]
+    arg [/opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/clang/14.0.1/lib/linux/clang_rt.crtend-x86_64.o] ==> ignore
+    arg [/usr/lib/../lib64/crtn.o] ==> ignore
+  remove lib [/opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/clang/14.0.1/lib/linux/libclang_rt.builtins-x86_64.a]
+  remove lib [/opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib/clang/14.0.1/lib/linux/libclang_rt.builtins-x86_64.a]
+  collapse library dir [/opt/cray/pe/mpich/8.1.17/ofi/cray/10.0/lib] ==> [/opt/cray/pe/mpich/8.1.17/ofi/cray/10.0/lib]
+  collapse library dir [/opt/cray/pe/libsci/21.08.1.2/CRAY/9.0/x86_64/lib] ==> [/opt/cray/pe/libsci/21.08.1.2/CRAY/9.0/x86_64/lib]
+  collapse library dir [/opt/cray/pe/dsmml/0.2.2/dsmml//lib] ==> [/opt/cray/pe/dsmml/0.2.2/dsmml/lib]
+  collapse library dir [/opt/cray/pe/cce/14.0.1/cce/x86_64/lib/pkgconfig/../] ==> [/opt/cray/pe/cce/14.0.1/cce/x86_64/lib]
+  collapse library dir [/opt/gcc/10.3.0/snos/lib64] ==> [/opt/gcc/10.3.0/snos/lib64]
+  collapse library dir [/opt/cray/pe/gcc/10.3.0/snos/lib64] ==> [/opt/cray/pe/gcc/10.3.0/snos/lib64]
+  collapse library dir [/opt/cray/pe/cce/14.0.1/cce/x86_64/lib/pkgconfig/../] ==> [/opt/cray/pe/cce/14.0.1/cce/x86_64/lib]
+  collapse library dir [/opt/cray/xpmem/2.3.2-2.2_9.4__g93dd7ee.shasta/lib64] ==> [/opt/cray/xpmem/2.3.2-2.2_9.4__g93dd7ee.shasta/lib64]
+  collapse library dir [/opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0] ==> [/opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0]
+  collapse library dir [/opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0/../../../../lib64] ==> [/opt/cray/pe/gcc/10.3.0/snos/lib64]
+  collapse library dir [/lib/../lib64] ==> [/lib64]
+  collapse library dir [/usr/lib/../lib64] ==> [/usr/lib64]
+  collapse library dir [/opt/cray/pe/cce/14.0.1/cce-clang/x86_64/bin/../lib] ==> [/opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib]
+  collapse library dir [/lib] ==> [/lib]
+  collapse library dir [/usr/lib] ==> [/usr/lib]
+  implicit libs: [mpi_cray;sci_cray_mpi_mp;sci_cray_mp;dl;dsmml;xpmem;stdc++;pgas-shmem;quadmath;modules;fi;craymath;f;u;csup;pthread;atomic;m;stdc++;m;craymp;-l:libunwind.so;pthread;c;-l:libunwind.so]
+  implicit dirs: [/opt/cray/pe/mpich/8.1.17/ofi/cray/10.0/lib;/opt/cray/pe/libsci/21.08.1.2/CRAY/9.0/x86_64/lib;/opt/cray/pe/dsmml/0.2.2/dsmml/lib;/opt/cray/pe/cce/14.0.1/cce/x86_64/lib;/opt/gcc/10.3.0/snos/lib64;/opt/cray/pe/gcc/10.3.0/snos/lib64;/opt/cray/xpmem/2.3.2-2.2_9.4__g93dd7ee.shasta/lib64;/opt/cray/pe/gcc/10.3.0/snos/lib/gcc/x86_64-suse-linux/10.3.0;/lib64;/usr/lib64;/opt/cray/pe/cce/14.0.1/cce-clang/x86_64/lib;/lib;/usr/lib]
+  implicit fwks: []
+
+

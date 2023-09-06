@@ -19,10 +19,8 @@
 
 # Compilers
 # Make sure you use the correct wrappers
-#CC=gcc
-#Correct CC and MPICC for Dardel
-CC=cc
-MPICC=cc
+CC=gcc
+MPICC=mpicc
 CUDACC=nvcc
 HIPCC=hipcc
 OMPFLAG= -fopenmp
@@ -33,7 +31,7 @@ LIBS=-lm
 
 # Targets to build
 # change energy_storms_cuda to energy_storms_hip in order to build for hip instead
-OBJS=energy_storms_seq energy_storms_omp energy_storms_mpi energy_storms_hip energy_storms_omp
+OBJS=energy_storms_seq energy_storms_omp energy_storms_mpi energy_storms_cuda
 
 # Rules. By default show help
 help:
@@ -43,15 +41,14 @@ help:
 	@echo "Group Trasgo, Universidad de Valladolid (Spain)"
 	@echo "EduHPC 2018: Peachy assignment"
 	@echo
-	@echo "make energy_storms_seq    Build only the sequential version"
-	@echo "make energy_storms_omp    Build only the OpenMP version"
-	@echo "make energy_storms_mpi    Build only the MPI version"
-	@echo "make energy_storms_cuda   Build only the CUDA version"
-	@echo "make energy_storms_hip    Build only the HIP version"
+	@echo "make energy_storms_seq	Build only the sequential version"
+	@echo "make energy_storms_omp	Build only the OpenMP version"
+	@echo "make energy_storms_mpi	Build only the MPI version"
+	@echo "make energy_storms_cuda	Build only the CUDA version"
 	@echo
-	@echo "make all                  Build all versions (Sequential, OpenMP, MPI, CUDA, HIP)"
-	@echo "make debug                Build all version with demo output for small arrays (size<=35)"
-	@echo "make clean                Remove targets"
+	@echo "make all	Build all versions (Sequential, OpenMP, MPI, CUDA)"
+	@echo "make debug	Build all version with demo output for small arrays (size<=35)"
+	@echo "make clean	Remove targets"
 	@echo
 
 all: $(OBJS)
@@ -59,7 +56,7 @@ all: $(OBJS)
 energy_storms_seq: energy_storms.c
 	$(CC) $(DEBUG) $< $(LIBS) -o $@
 
-energy_storms_omp: src/energy_storms_omp.cpp  # Add the source file here
+energy_storms_omp: energy_storms_omp.c
 	$(CC) $(DEBUG) $(OMPFLAG) $< $(LIBS) -o $@
 
 energy_storms_mpi: energy_storms_mpi.c
