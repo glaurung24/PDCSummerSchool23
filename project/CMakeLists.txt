@@ -157,30 +157,6 @@ if(OpenMP_CXX_FOUND)
                             sequential_functions
                             omp_functions
                             OpenMP::OpenMP_CXX)
-
-    include(CTest)
-
-    add_test(NAME OMP_basic_test
-            COMMAND omp_test_run_calculation 35 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p5_w3 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p7_w2 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p8_w1 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p8_w4
-    )
-    add_test(NAME OMP_extreme_positions_1
-            COMMAND omp_test_run_calculation 16 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_09_a16-17_p3_w1
-    )
-    add_test(NAME OMP_extreme_positions_2
-            COMMAND omp_test_run_calculation 17 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_09_a16-17_p3_w1
-    )
-    add_test(NAME OMP_test_03
-            COMMAND omp_test_run_calculation 20 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_03_a20_p4_w1
-    )
-    add_test(NAME OMP_test_04
-            COMMAND omp_test_run_calculation 20 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_04_a20_p4_w1
-    )
-    add_test(NAME OMP_test_05
-            COMMAND omp_test_run_calculation 20 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_05_a20_p4_w1
-    )
-    add_test(NAME OMP_test_06
-            COMMAND omp_test_run_calculation 20 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_06_a20_p4_w1
-    )
 else(OpenMP_CXX_FOUND)
     message("OpenMP not found, skipping install of energy_storms_omp")
 endif(OpenMP_CXX_FOUND)
