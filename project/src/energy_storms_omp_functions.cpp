@@ -5,16 +5,15 @@
 #include "energy_storms_omp.hpp"
 /* Headers for the OpenMP assignment versions */
 #include<omp.h>
-#define THRESHOLD    0.001f
 
 /* Use fopen function in local tests. The Tablon online judge software 
    substitutes it by a different function to run in its sandbox */
 #ifdef CP_TABLON
 #include "cputilstablon.h"
 #else
-namespace OMP_FUNCTIONS {
 #define    cp_open_file(name) fopen(name,"r")
 #endif
+namespace OMP_FUNCTIONS {
 
 
 
@@ -128,7 +127,6 @@ Storm read_storm_file( char *fname ) {
 void run_calculation(float* layer, float* layer_copy, const int& layer_size, Storm* storms, 
         const int& num_storms, float* maximum, int* positions) {
     int i, j, k;
-    /*
     // 4. Storms simulation
     for( i=0; i<num_storms; i++) {
 
@@ -151,15 +149,16 @@ void run_calculation(float* layer, float* layer_copy, const int& layer_size, Sto
 
         // 4.2. Energy relaxation between storms 
         // 4.2.1. Copy values to the ancillary array 
-        #pragma omp parallel for shared(layer, layer_copy)
+        #pragma omp parallel for
         for( k=0; k<layer_size; k++ ) 
             layer_copy[k] = layer[k];
 
         // 4.2.2. Update layer using the ancillary values.
         // Skip updating the first and last positions 
         #pragma omp parallel for
-        for( k=1; k<layer_size-1; k++ )
+        for( k=1; k<layer_size-1; k++ ) {
             layer[k] = ( layer_copy[k-1] + layer_copy[k] + layer_copy[k+1] ) / 3;
+        }
 
         // 4.3. Locate the maximum value in the layer, and its position 
         // Define private variables for each thread
@@ -178,8 +177,7 @@ void run_calculation(float* layer, float* layer_copy, const int& layer_size, Sto
                     }
                 }
             }
-            // use omp reduce to find max,
-            // check energy_storms_cuda_functions.cu line 281-283
+
             #pragma omp critical
             // One thread at a time
             {
@@ -191,52 +189,6 @@ void run_calculation(float* layer, float* layer_copy, const int& layer_size, Sto
             }
         }
     }
-    */
-
-    /* END: Do NOT optimize/parallelize the code below this point */
-    /* 4. Storms simulation */
-    for( i=0; i<num_storms; i++) {
-
-        /* 4.1. Add impacts energies to layer cells */
-        /* For each particle */
-        for( j=0; j<storms[i].size; j++ ) {
-            /* Get impact energy (expressed in thousandths) */
-            float energy = (float)storms[i].posval[j*2+1] * 1000;
-            /* Get impact position */
-            int position = storms[i].posval[j*2];
-
-            /* For each cell in the layer */
-            for( k=0; k<layer_size; k++ ) {
-                /* Update the energy value for the cell */
-                OMP_FUNCTIONS::update( layer, layer_size, k, position, energy );
-            }
-        }
-
-        /* 4.2. Energy relaxation between storms */
-        /* 4.2.1. Copy values to the ancillary array */
-        for( k=0; k<layer_size; k++ ) 
-            layer_copy[k] = layer[k];
-
-        /* 4.2.2. Update layer using the ancillary values.
-                  Skip updating the first and last positions */
-        for( k=1; k<layer_size-1; k++ )
-            layer[k] = ( layer_copy[k-1] + layer_copy[k] + layer_copy[k+1] ) / 3;
-
-        /* 4.3. Locate the maximum value in the layer, and its position */
-        for( k=1; k<layer_size-1; k++ ) {
-            /* Check it only if it is a local maximum */
-            if ( layer[k] > layer[k-1] && layer[k] > layer[k+1] ) {
-                if ( layer[k] > maximum[i] ) {
-                    maximum[i] = layer[k];
-                    positions[i] = k;
-                }
-            }
-        }
-    }
-
-    /* END: Do NOT optimize/parallelize the code below this point */
-
-
 }
 
 

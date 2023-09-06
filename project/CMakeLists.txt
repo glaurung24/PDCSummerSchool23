@@ -121,3 +121,4 @@ add_test(NAME OMP_test_05
 add_test(NAME OMP_test_06
         COMMAND omp_test_run_calculation 20 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_06_a20_p4_w1
 )
+

@@ -1,9 +1,10 @@
 /*
- * Test for MPI implentation of run_calculation() in high-energy particle storms
+ * Test for OMP implentation of run_calculation() in high-energy particle storms
  */
-#include<stdio.h>
-#include<stdlib.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <iostream>
+#include <vector>
 #include "energy_storms_sequential.hpp"
 #include "energy_storms_omp.hpp"
 
@@ -21,13 +22,15 @@ int main(int argc, char *argv[]) {
         exit( EXIT_FAILURE );
     }
 
+    /* 1.2. Read storms information */
+
     int layer_size = atoi( argv[1] );
     int num_storms = argc-2;
     SEQUENTIAL::Storm storms[ num_storms ];
+    SEQUENTIAL::read_storm_files(argc, argv, storms, num_storms);
+
     OMP_FUNCTIONS::Storm storms_omp[ num_storms ];
     
-    /* 1.2. Read storms information */
-    SEQUENTIAL::read_storm_files(argc, argv, storms, num_storms);
 
     /* 1.2. Read storms information */
     for (i = 2; i < argc; i++) {
@@ -39,7 +42,8 @@ int main(int argc, char *argv[]) {
     int positions[ num_storms ];
     float maximum_omp[ num_storms ];
     int positions_omp[ num_storms ];
-    for (int i=0; i<num_storms; i++) {
+
+    for (i=0; i<num_storms; i++) {
         maximum[i] = 0.0f;
         positions[i] = 0;
         maximum_omp[i] = 0.0f;
