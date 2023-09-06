@@ -2,86 +2,27 @@
 #include<stdlib.h>
 #include<math.h>
 #include<sys/time.h>
-#include <mpi.h>
-#include <algorithm>
-#include <iterator>
+#include "energy_storms_omp.hpp"
+/* Headers for the OpenMP assignment versions */
+#include<omp.h>
+
+/* Use fopen function in local tests. The Tablon online judge software 
+   substitutes it by a different function to run in its sandbox */
+#ifdef CP_TABLON
+#include "cputilstablon.h"
+#else
+#define    cp_open_file(name) fopen(name,"r")
+#endif
+namespace OMP_FUNCTIONS {
 
 
-#include "energy_storms_mpi.hpp"
 
-
-namespace MPI_FUNCTIONS{
 
 /* Function to get wall time */
 double cp_Wtime(){
     struct timeval tv;
     gettimeofday(&tv, NULL);
     return tv.tv_sec + 1.0e-6 * tv.tv_usec;
-}
-
-void read_storm_files(int argc,
-                    char* argv[], 
-                    Storm* storms, 
-                    const int& num_storms){
-    for(int i=2; i<argc; i++ ) 
-        storms[i-2] = read_storm_file( argv[i] );
-}
-
-void run_calculation(float* layer, const int& layer_size, Storm* storms, const int& num_storms,
-                float* maximum,
-                int* positions,
-                MPIInfo& mpi_info){
-
-
-
-    for(int k=0; k<layer_size; k++ ) layer[k] = 0.0f;
-    float* layer_sum;
-    if(mpi_info.rank == mpi_info.root){
-        layer_sum = new float[layer_size];
-    }
-    
-    /* 4. Storms simulation */
-    for(int i=0; i<num_storms; i++) {
-
-        /* 4.1. Add impacts energies to layer cells */
-        /* For each particle */
-        for(int j=mpi_info.rank; j<storms[i].size; j += mpi_info.size ) { //TODO check if for loop breaks before j<storms[i].size
-            /* Get impact energy (expressed in thousandths) */
-            float energy = (float)storms[i].posval[j*2+1] * 1000;
-            /* Get impact position */
-            int position = storms[i].posval[j*2];
-
-            /* For each cell in the layer */
-            for(int k=0; k<layer_size; k++ ) {
-                /* Update the energy value for the cell */
-                update( layer, layer_size, k, position, energy );
-            }
-        }
-
-
-        MPI_Reduce(layer, layer_sum, layer_size, MPI_FLOAT, MPI_SUM, mpi_info.root, MPI_COMM_WORLD);
-
-        if(mpi_info.rank == mpi_info.root){
-            std::swap(layer, layer_sum); //Move data back to layer of root processs
-            
-            energy_relaxation(layer, layer_size, AVERAGING_WINDOW_SIZE);
-
-            /* 4.3. Locate the maximum value in the layer, and its position */
-            find_local_maximum(layer, layer_size, maximum[i], positions[i]);
-        }
-        else{
-            for(int k=0; k<layer_size; k++ ) layer[k] = 0.0f; //Reset layer in other processes
-        }
-    }
-    if(mpi_info.rank == mpi_info.root){
-        //Error happens if pointer of layer is not original pointer
-        //This happens for odd numbers of storms
-        if(num_storms%2){
-            std::swap(layer, layer_sum);
-            memcpy(layer, layer_sum, sizeof(float)*layer_size); //TODO use containers instead...
-        }
-        delete[] layer_sum; // only allocated for root
-    }
 }
 
 /* THIS FUNCTION CAN BE MODIFIED */
@@ -143,11 +84,20 @@ void debug_print(int layer_size, float *layer, int *positions, float *maximum, i
     }
 }
 
+void read_storm_files(int argc,
+                    char* argv[], 
+                    Storm* storms, 
+                    const int& num_storms){
+    for(int i=2; i<argc; i++ ) 
+        storms[i-2] = read_storm_file( argv[i] );
+}
+
+
 /*
  * Function: Read data of particle storms from a file
  */
-Storm read_storm_file(char *fname ) {
-    FILE *fstorm = fopen( fname, "r" );
+Storm read_storm_file( char *fname ) {
+    FILE *fstorm = cp_open_file( fname );
     if ( fstorm == NULL ) {
         fprintf(stderr,"Error: Opening storm file %s\n", fname );
         exit( EXIT_FAILURE );
@@ -160,7 +110,7 @@ Storm read_storm_file(char *fname ) {
         exit( EXIT_FAILURE );
     }
 
-    storm.posval = new int[storm.size * 2 ];
+    storm.posval = (int *)malloc( sizeof(int) * storm.size * 2 );
     if ( storm.posval == NULL ) {
         fprintf(stderr,"Error: Allocating memory for storm file %s, with size %d\n", fname, storm.size );
         exit( EXIT_FAILURE );
@@ -181,30 +131,75 @@ Storm read_storm_file(char *fname ) {
     return storm;
 }
 
-// Energy relaxation between storms (moving average filter over windowSize elements)
-void energy_relaxation(float* layer, const int& layer_size, const int& windowSize){
-        /* 4.2. Energy relaxation between storms */
-        /* 4.2.1. Copy values to the ancillary array */
-        float *layer_copy = (float *)malloc( sizeof(float) * layer_size ); //TODO check if avoiding this malloc speeds things up
-        for(int k=0; k<layer_size; k++ ) 
-            layer_copy[k] = layer[k];
 
-        /* 4.2.2. Update layer using the ancillary values.
-                  Skip updating the first and last positions */
-        for(int k=1; k<layer_size-1; k++ )
-            layer[k] = ( layer_copy[k-1] + layer_copy[k] + layer_copy[k+1] ) / 3;
+void run_calculation(float* layer, const int& layer_size, Storm* storms, 
+        const int& num_storms, float* maximum, int* positions) {
+    int i, j, k;
+    float *layer_copy = (float *)malloc( sizeof(float) * layer_size );
+    // 4. Storms simulation
+    for( i=0; i<num_storms; i++) {
 
-}
+        // 4.1. Add impacts energies to layer cells
+        // For each particle
+        // make each thread private and use omp reduce add
+        #pragma omp parallel for private(j, k) reduction(+: layer[:layer_size])
+        for (j = 0; j < storms[i].size; j++) {
+            // Get impact energy (expressed in thousandths) 
+            float energy = (float)storms[i].posval[j * 2 + 1] * 1000;
+            // Get impact position
+            int position = storms[i].posval[j * 2];
 
-void find_local_maximum(float* layer, const int& layer_size, float& maximum, int& position ){
-    for(int k=1; k<layer_size-1; k++ ) {
-        /* Check it only if it is a local maximum */
-        if ( layer[k] > layer[k-1] && layer[k] > layer[k+1] ) {
-            if ( layer[k] > maximum ) {
-                maximum = layer[k];
-                position = k;
+            // For each cell in the layer
+            for (k = 0; k < layer_size; k++) {
+                // Update the energy value for the cell
+                update(layer, layer_size, k, position, energy);
             }
         }
+
+        // 4.2. Energy relaxation between storms 
+        // 4.2.1. Copy values to the ancillary array 
+        #pragma omp parallel for
+        for( k=0; k<layer_size; k++ ) 
+            layer_copy[k] = layer[k];
+
+        // 4.2.2. Update layer using the ancillary values.
+        // Skip updating the first and last positions 
+        #pragma omp parallel for
+        for( k=1; k<layer_size-1; k++ ) {
+            layer[k] = ( layer_copy[k-1] + layer_copy[k] + layer_copy[k+1] ) / 3;
+        }
+
+        // 4.3. Locate the maximum value in the layer, and its position 
+        // Define private variables for each thread
+        float local_maximum = -1.0f;
+        int local_position = -1;
+
+        // #pragma omp parallel private(local_maximum, local_position)
+        // {
+        //     #pragma omp for
+            for (k = 1; k < layer_size - 1; k++) {
+                // Check it only if it is a local maximum 
+                if (layer[k] > layer[k - 1] && layer[k] > layer[k + 1]) {
+                    if (layer[k] > local_maximum) {
+                        local_maximum = layer[k];
+                        local_position = k;
+                    }
+                }
+            }
+ 
+            // #pragma omp critical
+            // // // One thread at a time
+            // {
+                // Update global maximum and position 
+                if (local_maximum > maximum[i]) {
+                    maximum[i] = local_maximum;
+                    positions[i] = local_position;
+                }
+            // }
+        // }
     }
+    free(layer_copy);
 }
-}; //end of namespace MPI_FUNCTIONS
+
+}; //end of namespace OMP_FUNCTIONS
+   
