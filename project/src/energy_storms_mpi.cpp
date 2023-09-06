@@ -50,7 +50,7 @@ int main(int argc, char *argv[]) {
     mpi_info.rank = rank;
     double ttotal;
 
-    /* 1.1. Read arguments in the root process (assuming parallel read is slow/no parallelization allowed here)*/
+    /* 1.1. Read arguments in the root process */
     bool error = false;
     if(mpi_info.rank == MPI_ROOT_PROCESS){
         if (argc<3) {
@@ -69,7 +69,9 @@ int main(int argc, char *argv[]) {
     std::vector<MPI_FUNCTIONS::Storm> storms( num_storms );
 
     /* 1.2. Read storms information */
-    MPI_FUNCTIONS::read_storm_files(argc, argv, storms); //Check if reading scales with all processes (i.e. if parallel read is used)
+    //Check if reading scales with all processes (i.e. if parallel read is used)
+    //Might be faster to run only in root process
+    MPI_FUNCTIONS::read_storm_files(argc, argv, storms); 
 
     /* 1.3. Intialize maximum levels to zero */
     std::vector<float> maximum( num_storms, 0.0f );
@@ -94,10 +96,6 @@ int main(int argc, char *argv[]) {
     /* START: Do NOT optimize/parallelize the code of the main program above this point */
     /* 3. Allocate memory for the layer and initialize to zero */
     std::vector<float> layer(layer_size, 0.0f);
-    // if ( layer == NULL) { //TODO replace with try catch if needed
-    //     fprintf(stderr,"Error: Allocating the layer memory\n");
-    //     MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
-    // }
     MPI_FUNCTIONS::run_calculation(layer,
                     storms, 
                     maximum,

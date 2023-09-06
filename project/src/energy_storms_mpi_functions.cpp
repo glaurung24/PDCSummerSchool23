@@ -48,6 +48,9 @@ void run_calculation(std::vector<float>& layer,
 
         /* 4.1. Add impacts energies to layer cells */
         /* For each particle */
+        // This could lead to load imbalance, jobs are distributed between the 
+        // processes evenly. Could be more effective to implement a job queue
+        // for each particle
         for(int j=mpi_info.rank; j<storms[i].size; j += mpi_info.size ) {
             /* Get impact energy (expressed in thousandths) */
             float energy = (float)storms[i].posval[j*2+1] * 1000;
@@ -65,7 +68,11 @@ void run_calculation(std::vector<float>& layer,
         MPI_Reduce(layer.data(), layer_sum.data(), layer.size(), MPI_FLOAT, MPI_SUM, MPI_ROOT_PROCESS, MPI_COMM_WORLD);
         
         if(mpi_info.rank == MPI_ROOT_PROCESS){
-            layer.swap(layer_sum); //Move data back to vector layer of root processs
+            //Move data back to vector layer of root processs
+            layer.swap(layer_sum); 
+
+            // Running energy_relaxation() and find_local_maximum() sequencial, as those functions
+            // are relatively fast compared to the update step
             energy_relaxation(layer);
             /* 4.3. Locate the maximum value in the layer, and its position */
             find_local_maximum(layer, maximum[i], positions[i]);
@@ -177,7 +184,6 @@ Storm read_storm_file(char *fname ) {
 void energy_relaxation(std::vector<float>& layer){
         /* 4.2. Energy relaxation between storms */
         /* 4.2.1. Copy values to the ancillary array */
-        // std::vector<float> layer_copy = layer; //TODO check if avoiding this malloc speeds things up
         if(layer.size() < 3){
             return; //no energy relaxation if layer is too small
         }
