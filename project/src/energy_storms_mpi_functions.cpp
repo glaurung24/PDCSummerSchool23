@@ -1,10 +1,10 @@
-#include<stdio.h>
-#include<stdlib.h>
 #include<math.h>
 #include<sys/time.h>
 #include <mpi.h>
 #include <algorithm>
 #include <iterator>
+#include <vector>
+#include <iostream>
 
 
 #include "energy_storms_mpi.hpp"
@@ -21,72 +21,71 @@ double cp_Wtime(){
 
 void read_storm_files(int argc,
                     char* argv[], 
-                    Storm* storms, 
-                    const int& num_storms){
+                    std::vector<Storm>& storms
+                    ){
     for(int i=2; i<argc; i++ ) 
         storms[i-2] = read_storm_file( argv[i] );
 }
 
-void run_calculation(float* layer, const int& layer_size, Storm* storms, const int& num_storms,
-                float* maximum,
-                int* positions,
+void run_calculation(std::vector<float>& layer, 
+                std::vector<Storm>& storms,
+                std::vector<float>& maximum,
+                std::vector<int>& positions,
                 MPIInfo& mpi_info){
 
 
 
-    for(int k=0; k<layer_size; k++ ) layer[k] = 0.0f;
-    float* layer_sum;
-    if(mpi_info.rank == mpi_info.root){
-        layer_sum = new float[layer_size];
+    for(int k=0; k<layer.size(); k++ ){
+        layer[k] = 0.0f;
+    }
+    std::vector<float> layer_sum;
+    if(mpi_info.rank == MPI_ROOT_PROCESS){
+        layer_sum.resize(layer.size());
     }
     
     /* 4. Storms simulation */
-    for(int i=0; i<num_storms; i++) {
+    for(int i=0; i<storms.size(); i++) {
 
         /* 4.1. Add impacts energies to layer cells */
         /* For each particle */
-        for(int j=mpi_info.rank; j<storms[i].size; j += mpi_info.size ) { //TODO check if for loop breaks before j<storms[i].size
+        // This could lead to load imbalance, jobs are distributed between the 
+        // processes evenly. Could be more effective to implement a job queue
+        // for each particle
+        for(int j=mpi_info.rank; j<storms[i].size; j += mpi_info.size ) {
             /* Get impact energy (expressed in thousandths) */
             float energy = (float)storms[i].posval[j*2+1] * 1000;
             /* Get impact position */
             int position = storms[i].posval[j*2];
 
             /* For each cell in the layer */
-            for(int k=0; k<layer_size; k++ ) {
+            for(int k=0; k<layer.size(); k++ ) {
                 /* Update the energy value for the cell */
-                update( layer, layer_size, k, position, energy );
+                update( layer, k, position, energy);
             }
         }
 
+        
+        MPI_Reduce(layer.data(), layer_sum.data(), layer.size(), MPI_FLOAT, MPI_SUM, MPI_ROOT_PROCESS, MPI_COMM_WORLD);
+        
+        if(mpi_info.rank == MPI_ROOT_PROCESS){
+            //Move data back to vector layer of root processs
+            layer.swap(layer_sum); 
 
-        MPI_Reduce(layer, layer_sum, layer_size, MPI_FLOAT, MPI_SUM, mpi_info.root, MPI_COMM_WORLD);
-
-        if(mpi_info.rank == mpi_info.root){
-            std::swap(layer, layer_sum); //Move data back to layer of root processs
-            
-            energy_relaxation(layer, layer_size, AVERAGING_WINDOW_SIZE);
-
+            // Running energy_relaxation() and find_local_maximum() sequencial, as those functions
+            // are relatively fast compared to the update step
+            energy_relaxation(layer);
             /* 4.3. Locate the maximum value in the layer, and its position */
-            find_local_maximum(layer, layer_size, maximum[i], positions[i]);
+            find_local_maximum(layer, maximum[i], positions[i]);
         }
         else{
-            for(int k=0; k<layer_size; k++ ) layer[k] = 0.0f; //Reset layer in other processes
+            for(int k=0; k<layer.size(); k++ ) layer[k] = 0.0f; //Reset layer in other processes
         }
-    }
-    if(mpi_info.rank == mpi_info.root){
-        //Error happens if pointer of layer is not original pointer
-        //This happens for odd numbers of storms
-        if(num_storms%2){
-            std::swap(layer, layer_sum);
-            memcpy(layer, layer_sum, sizeof(float)*layer_size); //TODO use containers instead...
-        }
-        delete[] layer_sum; // only allocated for root
     }
 }
 
 /* THIS FUNCTION CAN BE MODIFIED */
 /* Function to update a single position of the layer */
-void update( float *layer, int layer_size, int k, int pos, float energy ) {
+void update( std::vector<float>& layer, int k, int pos, float energy ) {
     /* 1. Compute the absolute value of the distance between the
         impact position and the k-th position of the layer */
     int distance = pos - k;
@@ -101,22 +100,22 @@ void update( float *layer, int layer_size, int k, int pos, float energy ) {
     float atenuacion = sqrtf( (float)distance );
 
     /* 4. Compute attenuated energy */
-    float energy_k = energy / layer_size / atenuacion;
+    float energy_k = energy / layer.size() / atenuacion;
 
     /* 5. Do not add if its absolute value is lower than the threshold */
-    if ( energy_k >= THRESHOLD / layer_size || energy_k <= -THRESHOLD / layer_size )
+    if ( energy_k >= THRESHOLD / layer.size() || energy_k <= -THRESHOLD / layer.size() )
         layer[k] = layer[k] + energy_k;
 }
 
 
 /* ANCILLARY FUNCTIONS: These are not called from the code section which is measured, leave untouched */
 /* DEBUG function: Prints the layer status */
-void debug_print(int layer_size, float *layer, int *positions, float *maximum, int num_storms ) {
+void debug_print(std::vector<float>& layer, std::vector<int>& positions, std::vector<float>& maximum, int num_storms ) {
     int i,k;
     /* Only print for array size up to 35 (change it for bigger sizes if needed) */
-    if ( layer_size <= 35 ) {
+    if ( layer.size() <= 35 ) {
         /* Traverse layer */
-        for( k=0; k<layer_size; k++ ) {
+        for( k=0; k<layer.size(); k++ ) {
             /* Print the energy value of the current cell */
             printf("%10.4f |", layer[k] );
 
@@ -128,7 +127,7 @@ void debug_print(int layer_size, float *layer, int *positions, float *maximum, i
             for (i=0; i<ticks-1; i++ ) printf("o");
 
             /* If the cell is a local maximum print a special trailing character */
-            if ( k>0 && k<layer_size-1 && layer[k] > layer[k-1] && layer[k] > layer[k+1] )
+            if ( k>0 && k<layer.size()-1 && layer[k] > layer[k-1] && layer[k] > layer[k+1] )
                 printf("x");
             else
                 printf("o");
@@ -182,22 +181,25 @@ Storm read_storm_file(char *fname ) {
 }
 
 // Energy relaxation between storms (moving average filter over windowSize elements)
-void energy_relaxation(float* layer, const int& layer_size, const int& windowSize){
+void energy_relaxation(std::vector<float>& layer){
         /* 4.2. Energy relaxation between storms */
         /* 4.2.1. Copy values to the ancillary array */
-        float *layer_copy = (float *)malloc( sizeof(float) * layer_size ); //TODO check if avoiding this malloc speeds things up
-        for(int k=0; k<layer_size; k++ ) 
-            layer_copy[k] = layer[k];
-
+        if(layer.size() < 3){
+            return; //no energy relaxation if layer is too small
+        }
+        float previous = layer[0];
+        float current = layer[1];
         /* 4.2.2. Update layer using the ancillary values.
                   Skip updating the first and last positions */
-        for(int k=1; k<layer_size-1; k++ )
-            layer[k] = ( layer_copy[k-1] + layer_copy[k] + layer_copy[k+1] ) / 3;
-
+        for(int k=1; k<layer.size()-1; k++ ){
+            current = layer[k];
+            layer[k] = (previous + current + layer[k+1] ) / 3;
+            previous = current;
+        }
 }
 
-void find_local_maximum(float* layer, const int& layer_size, float& maximum, int& position ){
-    for(int k=1; k<layer_size-1; k++ ) {
+void find_local_maximum(std::vector<float>& layer, float& maximum, int& position ){
+    for(int k=1; k<layer.size()-1; k++ ) {
         /* Check it only if it is a local maximum */
         if ( layer[k] > layer[k-1] && layer[k] > layer[k+1] ) {
             if ( layer[k] > maximum ) {
