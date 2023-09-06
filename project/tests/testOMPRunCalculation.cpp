@@ -14,7 +14,6 @@
  * MAIN PROGRAM
  */
 int main(int argc, char *argv[]) {
-    int i, j, k;
 
     /* 1.1. Read arguments */
     if (argc<3) {
@@ -30,12 +29,14 @@ int main(int argc, char *argv[]) {
     SEQUENTIAL::read_storm_files(argc, argv, storms, num_storms);
 
     OMP_FUNCTIONS::Storm storms_omp[ num_storms ];
+    OMP_FUNCTIONS::read_storm_files(argc, argv, storms_omp, num_storms);
     
 
-    /* 1.2. Read storms information */
-    for (i = 2; i < argc; i++) {
-        storms_omp[i - 2] = OMP_FUNCTIONS::read_storm_file(argv[i]);
-    }
+    // /* 1.2. Read storms information */
+    // for (i = 2; i < argc; i++) {
+    //     storms_omp[i - 2] = OMP_FUNCTIONS::read_storm_file(argv[i]);
+    //     storms[i - 2] = SEQUENTIAL::read_storm_file(argv[i]);
+    // }
 
     /* 1.3. Intialize maximum levels to zero */
     float maximum[ num_storms ];
@@ -43,7 +44,7 @@ int main(int argc, char *argv[]) {
     float maximum_omp[ num_storms ];
     int positions_omp[ num_storms ];
 
-    for (i=0; i<num_storms; i++) {
+    for (int i=0; i<num_storms; i++) {
         maximum[i] = 0.0f;
         positions[i] = 0;
         maximum_omp[i] = 0.0f;
@@ -54,7 +55,6 @@ int main(int argc, char *argv[]) {
     /* 3. Allocate memory for the layer and initialize to zero */
     float *layer = (float *)malloc( sizeof(float) * layer_size );
     float *layer_omp = (float *)malloc( sizeof(float) * layer_size );
-    float *layer_copy = (float *)malloc( sizeof(float) * layer_size );
 
     if ( layer == NULL) {
         fprintf(stderr,"Error: Allocating the layer memory\n");
@@ -63,7 +63,7 @@ int main(int argc, char *argv[]) {
     SEQUENTIAL::run_calculation(layer, layer_size, storms, num_storms,
                     maximum,
                     positions);
-    OMP_FUNCTIONS::run_calculation(layer_omp, layer_copy, layer_size, storms_omp, num_storms,
+    OMP_FUNCTIONS::run_calculation(layer_omp, layer_size, storms_omp, num_storms,
                     maximum_omp,
                     positions_omp);
 

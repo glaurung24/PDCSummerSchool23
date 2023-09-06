@@ -84,6 +84,14 @@ void debug_print(int layer_size, float *layer, int *positions, float *maximum, i
     }
 }
 
+void read_storm_files(int argc,
+                    char* argv[], 
+                    Storm* storms, 
+                    const int& num_storms){
+    for(int i=2; i<argc; i++ ) 
+        storms[i-2] = read_storm_file( argv[i] );
+}
+
 
 /*
  * Function: Read data of particle storms from a file
@@ -124,9 +132,10 @@ Storm read_storm_file( char *fname ) {
 }
 
 
-void run_calculation(float* layer, float* layer_copy, const int& layer_size, Storm* storms, 
+void run_calculation(float* layer, const int& layer_size, Storm* storms, 
         const int& num_storms, float* maximum, int* positions) {
     int i, j, k;
+    float *layer_copy = (float *)malloc( sizeof(float) * layer_size );
     // 4. Storms simulation
     for( i=0; i<num_storms; i++) {
 
@@ -143,7 +152,7 @@ void run_calculation(float* layer, float* layer_copy, const int& layer_size, Sto
             // For each cell in the layer
             for (k = 0; k < layer_size; k++) {
                 // Update the energy value for the cell
-                OMP_FUNCTIONS::update(layer, layer_size, k, position, energy);
+                update(layer, layer_size, k, position, energy);
             }
         }
 
@@ -165,9 +174,9 @@ void run_calculation(float* layer, float* layer_copy, const int& layer_size, Sto
         float local_maximum = -1.0f;
         int local_position = -1;
 
-        #pragma omp parallel private(local_maximum, local_position)
-        {
-            #pragma omp for
+        // #pragma omp parallel private(local_maximum, local_position)
+        // {
+        //     #pragma omp for
             for (k = 1; k < layer_size - 1; k++) {
                 // Check it only if it is a local maximum 
                 if (layer[k] > layer[k - 1] && layer[k] > layer[k + 1]) {
@@ -177,28 +186,20 @@ void run_calculation(float* layer, float* layer_copy, const int& layer_size, Sto
                     }
                 }
             }
-
-            #pragma omp critical
-            // One thread at a time
-            {
+ 
+            // #pragma omp critical
+            // // // One thread at a time
+            // {
                 // Update global maximum and position 
                 if (local_maximum > maximum[i]) {
                     maximum[i] = local_maximum;
                     positions[i] = local_position;
                 }
-            }
-        }
+            // }
+        // }
     }
+    free(layer_copy);
 }
 
-
-void energy_relaxation(float* layer, const int& layer_size, const int& windowSize) {
-
-}
-
-
-void find_local_maximum(float* layer, const int& layer_size, float& maximum, int& position ) {
-
-}
 }; //end of namespace OMP_FUNCTIONS
    
