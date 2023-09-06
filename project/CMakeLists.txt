@@ -8,6 +8,8 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED On)
 set(CMAKE_CXX_EXTENSIONS Off)
+#Enable Ctest
+include(CTest)
 
 
 # --------------------- get git info -----------------------------------------------
@@ -70,20 +72,116 @@ target_include_directories(energy_storms_seq PRIVATE
                 ${CMAKE_CURRENT_SOURCE_DIR}/include) 
 
 #mpi program
-find_package(MPI REQUIRED)
-# message(STATUS "Run: ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${MPIEXEC_MAX_NUMPROCS} ${MPIEXEC_PREFLAGS} EXECUTABLE ${MPIEXEC_POSTFLAGS} ARGS")
+find_package(MPI)
+if(MPI_CXX_FOUND)
+    message(STATUS "Run: ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${MPIEXEC_MAX_NUMPROCS} energy_storm_mpi ARGS")
 
-add_library(mpi_functions SHARED 
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/energy_storms_mpi_functions.cpp)  
-target_include_directories(mpi_functions PRIVATE
-                    ${CMAKE_CURRENT_SOURCE_DIR}/include)        
-add_executable(energy_storms_mpi
-                src/energy_storms_mpi.cpp
-                )
-target_link_libraries(energy_storms_mpi PUBLIC
-                    mpi_functions MPI::MPI_CXX)   
-target_include_directories(energy_storms_mpi PRIVATE
-                ${CMAKE_CURRENT_SOURCE_DIR}/include)
+    add_library(mpi_functions SHARED 
+                ${CMAKE_CURRENT_SOURCE_DIR}/src/energy_storms_mpi_functions.cpp)  
+    target_include_directories(mpi_functions PRIVATE
+                        ${CMAKE_CURRENT_SOURCE_DIR}/include)        
+    add_executable(energy_storms_mpi
+                    src/energy_storms_mpi.cpp
+                    )
+    target_link_libraries(energy_storms_mpi PUBLIC
+                        mpi_functions MPI::MPI_CXX)   
+    target_include_directories(energy_storms_mpi PRIVATE
+                    ${CMAKE_CURRENT_SOURCE_DIR}/include)
+    add_executable(mpi_test_run_calculation
+            ${CMAKE_CURRENT_SOURCE_DIR}/tests/testMPIRunCalculation.cpp
+    )
+    target_include_directories(mpi_test_run_calculation PRIVATE
+                        ${CMAKE_CURRENT_SOURCE_DIR}/include)  
+    target_link_libraries(mpi_test_run_calculation PRIVATE
+                                sequential_functions
+                                mpi_functions
+                                MPI::MPI_CXX
+    )
+
+    add_test(NAME MPI_basic_test
+    COMMAND mpi_test_run_calculation 35 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p5_w3 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p7_w2 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p8_w1 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p8_w4
+    )
+    add_test(NAME MPI_extreme_positions_1
+            COMMAND mpiexec -np 4 mpi_test_run_calculation 16 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_09_a16-17_p3_w1
+    )
+    add_test(NAME MPI_extreme_positions_2
+            COMMAND mpi_test_run_calculation 17 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_09_a16-17_p3_w1
+    )
+    add_test(NAME MPI_test_03
+            COMMAND mpi_test_run_calculation 20 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_03_a20_p4_w1
+    )
+    add_test(NAME MPI_test_04
+            COMMAND mpi_test_run_calculation 20 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_04_a20_p4_w1
+    )
+    add_test(NAME MPI_test_05
+            COMMAND mpi_test_run_calculation 20 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_05_a20_p4_w1
+    )
+    add_test(NAME MPI_test_06
+            COMMAND mpi_test_run_calculation 20 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_06_a20_p4_w1
+    )
+else(MPI_CXX_FOUND)
+    message("MPI not detected, skipping install of energy_storms_mpi")
+endif(MPI_CXX_FOUND)
+
+# OpenMP program
+find_package(OpenMP)
+if(OpenMP_CXX_FOUND)
+    add_library(omp_functions SHARED 
+                ${CMAKE_CURRENT_SOURCE_DIR}/src/energy_storms_omp_functions.cpp)
+
+    target_include_directories(omp_functions PRIVATE
+                        ${CMAKE_CURRENT_SOURCE_DIR}/include)
+    target_link_libraries(omp_functions PRIVATE
+                        OpenMP::OpenMP_CXX)
+
+    add_executable(energy_storms_omp
+                    src/energy_storms_omp.cpp)
+
+    # Link the energy_storms_omp executable with omp_functions library and OpenMP
+    target_link_libraries(energy_storms_omp PRIVATE omp_functions OpenMP::OpenMP_CXX)
+
+
+    target_include_directories(energy_storms_omp PRIVATE
+                    ${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+    # OMP Test executable
+    add_executable(omp_test_run_calculation
+            ${CMAKE_CURRENT_SOURCE_DIR}/tests/testOMPRunCalculation.cpp
+    )
+    target_include_directories(omp_test_run_calculation PRIVATE
+                    ${CMAKE_CURRENT_SOURCE_DIR}/include)  
+    target_link_libraries(omp_test_run_calculation PRIVATE
+                            sequential_functions
+                            omp_functions
+                            OpenMP::OpenMP_CXX)
+
+    include(CTest)
+
+    add_test(NAME OMP_basic_test
+            COMMAND omp_test_run_calculation 35 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p5_w3 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p7_w2 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p8_w1 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p8_w4
+    )
+    add_test(NAME OMP_extreme_positions_1
+            COMMAND omp_test_run_calculation 16 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_09_a16-17_p3_w1
+    )
+    add_test(NAME OMP_extreme_positions_2
+            COMMAND omp_test_run_calculation 17 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_09_a16-17_p3_w1
+    )
+    add_test(NAME OMP_test_03
+            COMMAND omp_test_run_calculation 20 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_03_a20_p4_w1
+    )
+    add_test(NAME OMP_test_04
+            COMMAND omp_test_run_calculation 20 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_04_a20_p4_w1
+    )
+    add_test(NAME OMP_test_05
+            COMMAND omp_test_run_calculation 20 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_05_a20_p4_w1
+    )
+    add_test(NAME OMP_test_06
+            COMMAND omp_test_run_calculation 20 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_06_a20_p4_w1
+    )
+else(OpenMP_CXX_FOUND)
+    message("OpenMP not found, skipping install of energy_storms_omp")
+endif(OpenMP_CXX_FOUND)
+
 
 #cuda program
 include(CheckLanguage)
@@ -120,7 +218,6 @@ if(CMAKE_CUDA_COMPILER)
                                 sequential_functions
                                 cuda_functions
         )
-        include(CTest)
         add_test(NAME CUDA_basic_test
         COMMAND cuda_test_run_calculation 35 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p5_w3 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p7_w2 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p8_w1 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p8_w4
         )
@@ -145,46 +242,5 @@ if(CMAKE_CUDA_COMPILER)
 else()
         message("CUDA not detected, skipping install of energy_storms_cuda")
 endif()
-
-
-
-
-#Set up testing
-
-
-#MPI
-include(CTest)
-add_executable(mpi_test_run_calculation
-        ${CMAKE_CURRENT_SOURCE_DIR}/tests/testMPIRunCalculation.cpp
-)
-target_include_directories(mpi_test_run_calculation PRIVATE
-                    ${CMAKE_CURRENT_SOURCE_DIR}/include)  
-target_link_libraries(mpi_test_run_calculation PRIVATE
-                            sequential_functions
-                            mpi_functions
-                            MPI::MPI_CXX
-)
-
-add_test(NAME MPI_basic_test
-COMMAND mpi_test_run_calculation 35 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p5_w3 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p7_w2 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p8_w1 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_01_a35_p8_w4
-)
-add_test(NAME MPI_extreme_positions_1
-        COMMAND mpiexec -np 4 mpi_test_run_calculation 16 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_09_a16-17_p3_w1
-)
-add_test(NAME MPI_extreme_positions_2
-        COMMAND mpi_test_run_calculation 17 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_09_a16-17_p3_w1
-)
-add_test(NAME MPI_test_03
-        COMMAND mpi_test_run_calculation 20 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_03_a20_p4_w1
-)
-add_test(NAME MPI_test_04
-        COMMAND mpi_test_run_calculation 20 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_04_a20_p4_w1
-)
-add_test(NAME MPI_test_05
-        COMMAND mpi_test_run_calculation 20 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_05_a20_p4_w1
-)
-add_test(NAME MPI_test_06
-        COMMAND mpi_test_run_calculation 20 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_06_a20_p4_w1
-)
 
 

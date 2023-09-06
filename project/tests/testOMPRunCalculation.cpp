@@ -5,9 +5,9 @@
 #include<stdlib.h>
 #include <iostream>
 #include "energy_storms_sequential.hpp"
-#include "energy_storms_cuda.hpp"
+#include "energy_storms_mpi.hpp"
 
-#define EPS 1E-5 //precision of float
+#define EPS 1E-6 //precision of float
 
 /*
  * MAIN PROGRAM
@@ -27,8 +27,8 @@ int main(int argc, char *argv[]) {
 
     /* 1.2. Read storms information */
     SEQUENTIAL::read_storm_files(argc, argv, storms, num_storms);
-    CUDA::Storm storms_test[ num_storms ];
-    CUDA::read_storm_files(argc, argv, storms_test, num_storms);
+    MPI_FUNCTIONS::Storm storms_mpi[ num_storms ];
+    MPI_FUNCTIONS::read_storm_files(argc, argv, storms_mpi, num_storms);
     // for (int i=0; i<num_storms; i++){
     //     storms_mpi[i] = reinterpret_cast<MPI_FUNCTIONS::Storm>( storms[i] );
     // }
@@ -36,19 +36,19 @@ int main(int argc, char *argv[]) {
     /* 1.3. Intialize maximum levels to zero */
     float maximum[ num_storms ];
     int positions[ num_storms ];
-    float maximum_test[ num_storms ];
-    int positions_test[ num_storms ];
+    float maximum_mpi[ num_storms ];
+    int positions_mpi[ num_storms ];
     for (int i=0; i<num_storms; i++) {
         maximum[i] = 0.0f;
         positions[i] = 0;
-        maximum_test[i] = 0.0f;
-        positions_test[i] = 0;
+        maximum_mpi[i] = 0.0f;
+        positions_mpi[i] = 0;
     }
 
     /* START: Do NOT optimize/parallelize the code of the main program above this point */
     /* 3. Allocate memory for the layer and initialize to zero */
     float *layer = (float *)malloc( sizeof(float) * layer_size );
-    float *layer_test = (float *)malloc( sizeof(float) * layer_size );
+    float *layer_mpi = (float *)malloc( sizeof(float) * layer_size );
     if ( layer == NULL) {
         fprintf(stderr,"Error: Allocating the layer memory\n");
         exit( EXIT_FAILURE );
@@ -56,35 +56,32 @@ int main(int argc, char *argv[]) {
     SEQUENTIAL::run_calculation(layer, layer_size, storms, num_storms,
                     maximum,
                     positions);
-    CUDA::run_calculation(layer_test, layer_size, storms_test, num_storms,
-                    maximum_test,
-                    positions_test);
+    MPI_FUNCTIONS::run_calculation(layer_mpi, layer_size, storms_mpi, num_storms,
+                    maximum_mpi,
+                    positions_mpi);
 
     bool error = false;
     for(int i = 0; i < layer_size; i++){
-        if(abs(layer[i] - layer_test[i]) > abs(layer[i]*EPS) ){
-            std::cerr << "Error in layer check" << std::endl;
+        if(abs(layer[i] - layer_mpi[i]) > abs(layer[i]*EPS) ){
+            std::cout << "Error in layer check" << std::endl;
             error = true;
             break;
         }
     }
-    std::cerr << std::flush;
     for(int i = 0; i < num_storms; i++){
-        if(abs(maximum[i] - maximum_test[i]) > abs(maximum[i]*EPS) ){
-            std::cerr << "Error in maximum check" << std::endl;
+        if(abs(maximum[i] - maximum_mpi[i]) > abs(maximum[i]*EPS) ){
+            std::cout << "Error in maximum check" << std::endl;
             error = true;
             break;
         }
     }
-    std::cerr << std::flush;
     for(int i = 0; i < num_storms; i++){
-        if(positions[i] != positions_test[i]){
-            std::cerr << "Error in positions check" << std::endl;
+        if(positions[i] != positions_mpi[i]){
+            std::cout << "Error in positions check" << std::endl;
             error = true;
             break;
         }
     }
-    std::cerr << std::flush;
 
 
     /* 8. Free resources */    
