@@ -79,7 +79,10 @@ if(MPI_CXX_FOUND)
     add_library(mpi_functions SHARED 
                 ${CMAKE_CURRENT_SOURCE_DIR}/src/energy_storms_mpi_functions.cpp)  
     target_include_directories(mpi_functions PRIVATE
-                        ${CMAKE_CURRENT_SOURCE_DIR}/include)        
+                        ${CMAKE_CURRENT_SOURCE_DIR}/include
+                        ${MPI_INCLUDE_PATH})
+    target_link_libraries(mpi_functions PUBLIC
+                        MPI::MPI_CXX)      
     add_executable(energy_storms_mpi
                     src/energy_storms_mpi.cpp
                     )
