@@ -87,9 +87,10 @@ int main(int argc, char *argv[]) {
     printf("\n");
 
     /* 8. Free resources */    
-    for(int i=0; i<argc-2; i++ )
-        free( storms[i].posval );
-
+    for(int i=0; i<argc-2; i++ ){
+        free( storms[i].pos );
+        free( storms[i].val );
+    }
     /* 9. Program ended successfully */
     return 0;
 }

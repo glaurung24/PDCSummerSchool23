@@ -11,7 +11,8 @@ namespace CUDA{
 /* Structure used to store data for one storm of particles */
 typedef struct {
     int size;    // Number of particles
-    int *posval; // Positions and values
+    int *pos; // Positions and values
+    int *val;
 } Storm;
 
 double cp_Wtime();

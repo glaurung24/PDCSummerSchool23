@@ -94,7 +94,7 @@ void update( float *layer, const int& layer_size, const int& k, const int& pos, 
     float energy_k = energy *factor;
 
     /* 5. Do not add if its absolute value is lower than the threshold */
-    if ( energy_k >= THRESHOLD / layer_size || energy_k <= -THRESHOLD / layer_size ) //TODO are negative energies?
+    if ( energy_k >= THRESHOLD / layer_size || energy_k <= -THRESHOLD / layer_size )
         layer[k] = layer[k] + energy_k;
 }
 

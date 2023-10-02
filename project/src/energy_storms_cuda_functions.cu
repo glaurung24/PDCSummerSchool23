@@ -5,7 +5,9 @@
 #include <vector>
 
 #include <thrust/transform.h>
+#include <thrust/extrema.h>
 #include <thrust/execution_policy.h>
+#include <thrust/device_vector.h>
 #include <cuda.h>
 #include "energy_storms_cuda.hpp"
 
@@ -48,6 +50,9 @@ __global__ void energy_relaxation(
         }
         
     }
+    if(localIdx == THREAD_BLOCK_SIZE-1 && (globalIdx +1) < size){
+        local_array[localIdx+2] = array[globalIdx+1];
+    }
     __syncthreads();
     if(globalIdx >= (size - 1)){ //Don't update last element in layer
         return;
@@ -58,7 +63,7 @@ __global__ void energy_relaxation(
 }
 
 
-// TODO code from https://github.com/NVIDIA-developer-blog/code-samples/blob/master/posts/cuda-aware-mpi-example/src/Device.cu
+// code from https://github.com/NVIDIA-developer-blog/code-samples/blob/master/posts/cuda-aware-mpi-example/src/Device.cu
 /**
  * @brief Compute the maximum of 2 single-precision floating point values using an atomic operation
  *
@@ -111,13 +116,17 @@ __global__ void find_local_maximum(
         }
         
     }
+    //Update last element of local_array
+    if(localIdx == THREAD_BLOCK_SIZE-1 && (globalIdx +1) < size){
+        local_array[localIdx+2] = array[globalIdx+1];
+    }
     __syncthreads();
     if(local_array[localIdx+1] > local_array[localIdx] &&
          local_array[localIdx+1] > local_array[localIdx+2]
          //Prevents the last element in layer to be eligible for local maximum
         && globalIdx < (size -1)){
         //First check if found maximum is larger than the maximum in local memory
-        //to avoid unneccesary calls to atomicMax 
+        //to avoid unneccesary calls to atomicMax
         if(local_array[localIdx+1] > local_maximum){
             local_maximum = local_array[localIdx+1];
             atomicMax(maximum, local_maximum);
@@ -132,41 +141,60 @@ __global__ void find_local_maximum(
 //Note: size is half of the dimension of array!
 __global__ void generate_look_up(
     float array[],
-    const int size
+    const int size,
+    const int layer_size
     ){
     for(int i = threadIdx.x + blockIdx.x*blockDim.x;
-        i<2*size;
+        i<size*2;
         i+=blockDim.x * gridDim.x){
-        array[i] = (1.0f/sqrtf((float)abs(size-i)+1.0f)/(float)size);
+        array[i] = (1.0f/sqrtf((float)abs(size-i)+1.0f)/(float)layer_size);
     }
 }
 
 void run_calculation(float* layer, const int& layer_size, Storm* storms, const int& num_storms,
                 float* maximum,
                 int* positions){
-
-    float* look_up_device;
     float* layer_device;
     //Allocate device memory
-    if(cudaMalloc((void**)&look_up_device, 2*sizeof(float)*layer_size)
-        != cudaSuccess ){
-        std::cerr << "Error during allocation of device memory" << std::endl;
-        exit(EXIT_FAILURE);
-    }
     if(cudaMalloc((void**)&layer_device, sizeof(float)*layer_size)
         != cudaSuccess ){
         std::cerr << "Error during allocation of device memory" << std::endl;
-        cudaFree( look_up_device);
         exit(EXIT_FAILURE);
     }
     //Initialize layer_device
     cudaMemset(layer_device, 0.0f, sizeof(float)*layer_size);
+    //Check if there is a position larger than layer size
+    //The lookup table needs to be expanded accordingly if that is the case
+    int maxPosition = layer_size;
+    bool errorWarning = false;
+    for(int i=0; i<num_storms; i++){
+        thrust::device_vector<int> positions_device(storms[i].pos, storms[i].pos+storms[i].size);
+        thrust::detail::normal_iterator<thrust::device_ptr<int>> max = 
+            thrust::max_element(thrust::device,
+                                positions_device.begin(),
+                                positions_device.end()
+                            );
+        if(*max > layer_size){
+            if(!errorWarning){
+                std::cerr << "Warning: Position found larger than layer size, can lead to increased memory usage." << std::endl;
+                errorWarning = true;
+            }
+            maxPosition = *max;
+        }
+    }
     //generate lookup on device
     //lookup table for prefactor 1/sqrt(distance)/layer_size
-    //It needs to be 2*layer_size to fit 
-    int nr_blocks = ceil(2*layer_size/(float)THREAD_BLOCK_SIZE);
-    generate_look_up<<<nr_blocks, THREAD_BLOCK_SIZE>>>(look_up_device, layer_size);
-
+    //It needs to be 2*layer_size or 2 times of the maximum position to fit
+    float* look_up_device;
+    if(cudaMalloc((void**)&look_up_device, 2*sizeof(float)*maxPosition)
+        != cudaSuccess ){
+        std::cout << "Error during allocation of device memory" << std::endl;
+        cudaFree( layer_device);
+        exit(EXIT_FAILURE);
+    }
+    int nr_blocks = ceil(2*maxPosition/(float)THREAD_BLOCK_SIZE);
+    generate_look_up<<<nr_blocks, THREAD_BLOCK_SIZE>>>(look_up_device, maxPosition, layer_size);
+    
     /* 4. Storms simulation */
     for(int i=0; i<num_storms; i++) {
 
@@ -174,16 +202,10 @@ void run_calculation(float* layer, const int& layer_size, Storm* storms, const i
         /* For each particle */
         for(int j=0; j<storms[i].size; j++ ) {
             /* Get impact energy (expressed in thousandths) */
-            float energy = (float)storms[i].posval[j*2+1] * 1000;
+            float energy = (float)storms[i].val[j] * 1000;
             /* Get impact position */
-            int position = storms[i].posval[j*2];
-            int translated_position = layer_size-position; //relative position to find right part of lookup
-            if(position >= layer_size){
-                std::cerr << "position outside of layer" << std::endl;
-                cudaFree(layer_device);
-                cudaFree(look_up_device);
-                exit(EXIT_FAILURE);
-            }
+            int position = storms[i].pos[j];
+            int translated_position = maxPosition-position; //relative position to find right part of lookup
             float sign = 1.0f;
             if(energy < 0){
                 energy = abs(energy);
@@ -214,6 +236,8 @@ void run_calculation(float* layer, const int& layer_size, Storm* storms, const i
         int* position_device;
         cudaMalloc((void**)&maximum_device, sizeof(float));
         cudaMalloc((void**)&position_device, sizeof(int));
+        cudaMemset(maximum_device, 0.0f, sizeof(float));
+        cudaMemset(position_device, 0, sizeof(int));
 
         find_local_maximum<<<nr_blocks, THREAD_BLOCK_SIZE>>>(layer_device, layer_size, maximum_device, position_device);
  
@@ -282,8 +306,9 @@ Storm read_storm_file(char *fname ) {
         exit( EXIT_FAILURE );
     }
 
-    storm.posval = (int *)malloc( sizeof(int) * storm.size * 2 );
-    if ( storm.posval == NULL ) {
+    storm.pos = (int *)malloc( sizeof(int) * storm.size );
+    storm.val = (int *)malloc( sizeof(int) * storm.size );
+    if ( storm.pos == NULL || storm.val == NULL) {
         fprintf(stderr,"Error: Allocating memory for storm file %s, with size %d\n", fname, storm.size );
         exit( EXIT_FAILURE );
     }
@@ -291,8 +316,8 @@ Storm read_storm_file(char *fname ) {
     int elem;
     for ( elem=0; elem<storm.size; elem++ ) {
         ok = fscanf(fstorm, "%d %d\n", 
-                    &(storm.posval[elem*2]),
-                    &(storm.posval[elem*2+1]) );
+                    &(storm.pos[elem]),
+                    &(storm.val[elem]) );
         if ( ok != 2 ) {
             fprintf(stderr,"Error: Reading element %d in storm file %s\n", elem, fname );
             exit( EXIT_FAILURE );
