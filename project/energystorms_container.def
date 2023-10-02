@@ -1,0 +1,40 @@
+Bootstrap: docker
+From: nvidia/cuda:12.2.0-devel-ubuntu22.04
+
+%post
+    export DEBIAN_FRONTEND=noninteractive
+    apt-get update -y
+    apt-get install git -y
+    apt-get install apt-utils -y
+    apt-get install build-essential -y
+    apt-get install cmake -y
+    apt-get install vim -y
+
+    apt-get update -y
+    apt-get upgrade -y
+
+    #install the energy storms project
+    cd /home
+    git clone https://github.com/glaurung24/PDCSummerSchool23.git
+    cd /home/PDCSummerSchool23/project
+    mkdir build
+    cd build
+    cmake ..
+    make -j
+
+
+%test
+    cd /home/PDCSummerSchool23/project/build
+    ctest
+
+
+
+%environment
+    export LC_ALL=C
+
+%labels
+    Author Andreas Theiler
+    Version v0.0.1
+
+%help
+    This is a container for running the pdc summerschool 23 code project energy storms
