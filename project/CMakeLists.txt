@@ -218,6 +218,9 @@ if(CMAKE_CUDA_COMPILER)
         add_test(NAME CUDA_test_06
                 COMMAND cuda_test_run_calculation 20 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_06_a20_p4_w1
         )
+        add_test(NAME CUDA_test_07
+                COMMAND cuda_test_run_calculation 20000 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_02_a30k_p20k_w1 ${CMAKE_CURRENT_SOURCE_DIR}/test_files/test_02_a30k_p20k_w2
+        )
 else()
         message("CUDA not detected, skipping install of energy_storms_cuda")
 endif()
